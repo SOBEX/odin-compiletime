@@ -1,0 +1,34 @@
+{
+   // See https://go.microsoft.com/fwlink/?LinkId=733558
+   // for the documentation about the tasks.json format
+   "version": "2.0.0",
+   "tasks": [
+      {
+         "label": "Build test (Debug)",
+         "type": "shell",
+         "command": "odin build test -debug",
+         "group": {
+            "kind": "build",
+            "isDefault": true
+         }
+      },
+      {
+         "label": "Build test (Size)",
+         "type": "shell",
+         "command": "odin build test -debug -o:size",
+         "group": "build"
+      },
+      {
+         "label": "Build test (Speed)",
+         "type": "shell",
+         "command": "odin build test -debug -o:speed",
+         "group": "build"
+      },
+      {
+         "label": "Build test (Aggressive)",
+         "type": "shell",
+         "command": "odin build test -debug -o:aggressive",
+         "group": "build"
+      }
+   ]
+}
