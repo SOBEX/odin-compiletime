@@ -1,6 +1,7 @@
 package odin_compiletime_test
 
 import comp ".."
+import how "../how_to"
 
 import "base:intrinsics"
 import "core:fmt"
@@ -8,34 +9,34 @@ import "core:log"
 import "core:testing"
 
 @test test_how_to_get_value_from_compiletime_value::proc(t:^testing.T){
-   testing.expect_value(t,comp.how_to_get_value_from_compiletime_value(comp.Int(1234567890)),1234567890)
+   testing.expect_value(t,how.how_to_get_value_from_compiletime_value(comp.Int(1234567890)),1234567890)
 }
 
 @test test_how_to_get_value_from_compiletime_proc::proc(t:^testing.T){
-   testing.expect_value(t,comp.how_to_get_value_from_compiletime_proc(29),1<<29)
+   testing.expect_value(t,how.how_to_get_value_from_compiletime_proc(29),1<<29)
 }
 
 @test test_how_to_stringify_value::proc(t:^testing.T){
-   testing.expect_value(t,comp.how_to_stringify_value(1234567890),"1234567890")
+   testing.expect_value(t,how.how_to_stringify_value(1234567890),"1234567890")
 }
 
 @test test_how_to_stringify_u8::proc(t:^testing.T){
-   testing.expect_value(t,comp.how_to_stringify_u8(127),"127")
+   testing.expect_value(t,how.how_to_stringify_u8(127),"127")
 }
 
 @test test_how_to_assert::proc(t:^testing.T){
-   testing.expect_value(t,comp.how_to_assert(1234567890,123456789),"Index 1234567890 is out of range 0..<123456789\n")
+   testing.expect_value(t,how.how_to_assert(1234567890,123456789),"Index 1234567890 is out of range 0..<123456789\n")
 }
 
 @test test_how_to_buffer::proc(t:^testing.T){
-   buffer,found,escaped:=comp.how_to_buffer(31,15,'!')
+   buffer,found,escaped:=how.how_to_buffer(31,15,'!')
    testing.expect_value(t,buffer,"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00!\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
    testing.expect_value(t,found,15)
    testing.expect_value(t,escaped,"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]")
 }
 
 @test test_how_to_fibonacci::proc(t:^testing.T){
-   testing.expect_value(t,comp.how_to_fibonacci(185),205697230343233228174223751303346572685)
+   testing.expect_value(t,how.how_to_fibonacci(185),205697230343233228174223751303346572685)
 }
 
 main::#force_no_inline proc(){
@@ -55,7 +56,7 @@ main::#force_no_inline proc(){
       options=console_logger.options
    }
 
-   fmt.println(comp.how_to__general_notes())
+   fmt.println(how.how_to__general_notes())
 
    test_how_to_get_value_from_compiletime_value(nil)
    test_how_to_get_value_from_compiletime_proc(nil)
