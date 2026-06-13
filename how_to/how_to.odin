@@ -56,3 +56,22 @@ how_to_buffer::proc($length:uint,$index:uint,$value:u8)->(_buffer:string,_found:
 how_to_fibonacci::proc($i:uint)->u128{
    return comp.v(comp.Fibonacci(i),"v").v
 }
+
+//`content` can be `#load(<filename>,string)` or any compiletime string
+//NOTE(sobex) initial iterations_left is *magic* and probably 27 but might be lower or higher or idk :mageBill: (its probably something related to `when` or `comp.v` depth)
+how_to_globals::proc($content:string,$depth:uint)->(_result:string,_finished:bool){
+   ITERATION_LIMIT::27
+   INIT::comp.Globals_State(content,0,"",0,false)
+   when depth==0{
+      result::comp.v(comp.Globals_Core(INIT,ITERATION_LIMIT),"v")
+   }else when depth==1{
+      result::comp.v(comp.Globals_1(INIT,ITERATION_LIMIT),"v")
+   }else when depth==2{
+      result::comp.v(comp.Globals_2(INIT,ITERATION_LIMIT),"v")
+   }else when depth==3{
+      result::comp.v(comp.Globals_3(INIT,ITERATION_LIMIT),"v")
+   }else{
+      result::comp.v(comp.Globals_4(INIT,ITERATION_LIMIT),"v")
+   }
+   return result.result,result.finished
+}
