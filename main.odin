@@ -347,6 +347,9 @@ RUNES::[256]string{
 U8_PREFIX::PACKAGE+"::U8(v:$$"
 U8_OFFSET::len(U8_PREFIX)
 
+INT_PREFIX::PACKAGE+"::Int(v:$$"
+INT_OFFSET::len(INT_PREFIX)
+
 //NOTE(sobex) [N]u8 needs exponentially long to typecheck
 Buffer::struct(v:string){}
 
@@ -390,7 +393,7 @@ Fibonacci_Matrix_2x2::struct(v:[2][2]u128){}
 
 Fibonacci_Matrix_2x2_Identity::Fibonacci_Matrix_2x2({{1,0},{0,1}})
 
-Fibonacci_Matrix_2x2_Mul::struct(l:typeid,r:typeid){
+Fibonacci_Matrix_2x2_Mul::struct(l,r:/*Fibonacci_Matrix_2x2*/typeid){
    v:Fibonacci_Matrix_2x2(
       {
          {
@@ -405,7 +408,7 @@ Fibonacci_Matrix_2x2_Mul::struct(l:typeid,r:typeid){
    )
 }
 
-Fibonacci_Matrix_2x2_Pow::struct(m:typeid,exp:uint){
+Fibonacci_Matrix_2x2_Pow::struct(m:/*Fibonacci_Matrix_2x2*/typeid,exp:uint){
    v:/*Fibonacci_Matrix_2x2*/(
       (
          Fibonacci_Matrix_2x2_Identity
@@ -543,33 +546,39 @@ Globals_4::struct(s:/*Globals_State*/typeid,iterations_left:uint){
 }
 
 when #config(MAGEBILL,false){
-   BLA::"\e[40m "
-   RED::"\e[41m "
-   GRE::"\e[42m "
-   YEL::"\e[43m "
-   BLU::"\e[44m "
-   MAG::"\e[45m "
-   CYA::"\e[46m "
-   WHI::"\e[47m "
-   RESET::"\e[0m"
-   NL::RESET+"\n"
-   MAGEBILL1::NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLU+BLU+BLU+BLU+MAG+MAG+MAG+MAG+MAG+MAG+MAG+MAG+MAG+BLU+BLU+BLU+BLU+BLU+BLA+BLA+BLA+BLA+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLA+BLA+BLA+BLA+BLA+NL+
-      BLA+BLA+BLU+BLU+BLU+BLU+BLU+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+YEL+YEL+YEL+BLU+BLU+BLU+BLU+BLU+BLA+BLA+BLA+BLA+NL+
-      BLA+BLA+BLU+BLU+BLU+BLU+BLU+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+YEL+YEL+YEL+BLU+BLU+CYA+CYA+CYA+CYA+CYA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLU+BLU+BLU+BLU+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+YEL+YEL+YEL+BLU+CYA+CYA+CYA+CYA+CYA+CYA+CYA+BLA
-   MAGEBILL2::NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+YEL+YEL+YEL+BLA+BLA+CYA+CYA+CYA+CYA+CYA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+WHI+YEL+YEL+YEL+YEL+YEL+YEL+YEL+WHI+WHI+YEL+YEL+YEL+BLA+BLA+BLA+BLA+YEL+YEL+YEL+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+YEL+YEL+WHI+WHI+WHI+WHI+WHI+YEL+YEL+YEL+YEL+WHI+WHI+BLA+BLA+BLA+BLA+YEL+YEL+YEL+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+YEL+YEL+YEL+YEL+YEL+YEL+YEL+YEL+YEL+YEL+WHI+WHI+WHI+BLA+BLA+BLA+BLA+YEL+YEL+YEL+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLA+BLA+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+BLA+BLA+BLA+BLA+YEL+YEL+YEL+BLA+BLA+BLA+NL+
-      BLA+BLA+BLA+BLA+BLA+BLA+BLU+BLU+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+BLU+BLU+BLU+BLA+YEL+YEL+YEL+BLA+BLA+BLA+NL+
-      BLA+BLA+BLU+BLU+BLU+BLU+BLU+BLU+BLU+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+WHI+BLU+BLU+BLU+BLU+BLU+YEL+YEL+YEL+BLA+BLA+BLA+NL+
-      BLA+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+BLU+YEL+YEL+YEL+BLA+BLA+BLA
-   #panic(MAGEBILL1+MAGEBILL2+NL)
+   #panic("\e[0m\n"+
+          "\e[40m           \e[44m        \e[40m           \e[0m\n"+
+          "\e[40m          \e[44m          \e[40m          \e[0m\n"+
+          "\e[40m         \e[44m         \e[40m            \e[0m\n"+
+          "\e[40m     \e[44m    \e[45m         \e[44m     \e[40m       \e[0m\n"+
+          "\e[40m   \e[44m                      \e[40m     \e[0m\n"+
+          "\e[40m  \e[44m     \e[47m           \e[43m   \e[44m     \e[40m    \e[0m\n"+
+          "\e[40m  \e[44m     \e[47m           \e[43m   \e[44m  \e[46m     \e[40m  \e[0m\n"+
+          "\e[40m   \e[44m    \e[47m           \e[43m   \e[44m \e[46m       \e[40m \e[0m\n"+
+          "\e[40m       \e[47m           \e[43m   \e[40m  \e[46m     \e[40m  \e[0m\n"+
+          "\e[40m       \e[47m \e[43m       \e[47m  \e[43m   \e[40m    \e[43m   \e[40m   \e[0m\n"+
+          "\e[40m       \e[43m  \e[47m     \e[43m    \e[47m  \e[40m    \e[43m   \e[40m   \e[0m\n"+
+          "\e[40m       \e[43m          \e[47m   \e[40m    \e[43m   \e[40m   \e[0m\n"+
+          "\e[40m        \e[47m            \e[40m    \e[43m   \e[40m   \e[0m\n"+
+          "\e[40m      \e[44m  \e[47m            \e[44m   \e[40m \e[43m   \e[40m   \e[0m\n"+
+          "\e[40m  \e[44m       \e[47m          \e[44m     \e[43m   \e[40m   \e[0m\n"+
+          "\e[40m \e[44m                       \e[43m   \e[40m   \e[0m\n")
+}else when #config(MAGEBILLASCII,false){
+   #panic("\e[0m\n"+
+          "\e[30m           \e[34m,-----..\e[30m           \e[0m\n"+
+          "\e[30m          \e[34m:       .'\e[30m          \e[0m\n"+
+          "\e[30m         \e[34m:       :\e[30m            \e[0m\n"+
+          "\e[30m     \e[34m.--'\e[35m#########\e[34m'---.\e[30m       \e[0m\n"+
+          "\e[30m   \e[34m,---.============.---,\e[30m     \e[0m\n"+
+          "\e[30m  \e[34m:    \e[37m:          \e[33m###\e[34m    :\e[30m    \e[0m\n"+
+          "\e[30m  \e[34m:    \e[37m:          \e[33m###\e[34m  \e[36m.---.\e[30m  \e[0m\n"+
+          "\e[30m   \e[34m'---\e[37m:          \e[33m###\e[34m-\e[36m:     :\e[30m \e[0m\n"+
+          "\e[30m       \e[37m:          \e[33m###\e[30m  \e[36m:___:\e[30m  \e[0m\n"+
+          "\e[30m       \e[37m:\e[33m#######\e[37m  \e[33m##:\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+          "\e[30m       \e[33m##\e[37m     \e[33m####\e[37m .\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+          "\e[30m       \e[33m'#########\e[37m  :\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+          "\e[30m        \e[37m:          .\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+          "\e[30m      \e[34m.:\e[37m:          .\e[34m::.\e[30m \e[33m: :\e[30m   \e[0m\n"+
+          "\e[30m  \e[34m..-=   \e[37m'--------'\e[34m    =\e[33m: :\e[30m   \e[0m\n"+
+          "\e[30m \e[34m:______________________\e[33m:_:\e[30m   \e[0m\n")
 }

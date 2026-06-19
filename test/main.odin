@@ -59,45 +59,48 @@ import "core:fmt"
 
 print::proc(name:string,value:any){...}
 
-main::proc(){...}`
+main::proc(){...}
+`
    result,finished:=how.how_to_globals(src,2)
    testing.expect_value(t,finished,true)
    testing.expect_value(t,result,expected)
 }
 
-main::#force_no_inline proc(){
-   console_logger:=log.create_console_logger()
-   defer log.destroy_console_logger(context.logger)
+when !ODIN_TEST{
+   main::#force_no_inline proc(){
+      console_logger:=log.create_console_logger()
+      defer log.destroy_console_logger(context.logger)
 
-   context.logger=log.Logger{
-      procedure=proc(data:rawptr,level:log.Level,text:string,options:log.Options,location:=#caller_location){
-         logger:=cast(^log.Logger)data
-         logger.procedure(logger.data,level,text,options,location)
-         when ODIN_DEBUG{
-            intrinsics.debug_trap()
-         }
-      },
-      data=&console_logger,
-      lowest_level=console_logger.lowest_level,
-      options=console_logger.options
+      context.logger=log.Logger{
+         procedure=proc(data:rawptr,level:log.Level,text:string,options:log.Options,location:=#caller_location){
+            logger:=cast(^log.Logger)data
+            logger.procedure(logger.data,level,text,options,location)
+            when ODIN_DEBUG{
+               intrinsics.debug_trap()
+            }
+         },
+         data=&console_logger,
+         lowest_level=console_logger.lowest_level,
+         options=console_logger.options
+      }
+
+      fmt.println(how.how_to__general_notes())
+
+      result,finished:=how.how_to_globals(#load("../main.odin",string),4)
+      fmt.print(result)
+      if finished{
+         fmt.println(" <Finished successfully>")
+      }else{
+         fmt.println("<Aborted due to reaching iteration limit>")
+      }
+
+      test_how_to_get_value_from_compiletime_value(nil)
+      test_how_to_get_value_from_compiletime_proc(nil)
+      test_how_to_stringify_value(nil)
+      test_how_to_stringify_u8(nil)
+      test_how_to_assert(nil)
+      test_how_to_buffer(nil)
+      test_how_to_fibonacci(nil)
+      test_how_to_globals(nil)
    }
-
-   fmt.println(how.how_to__general_notes())
-
-   result,finished:=how.how_to_globals(#load("../main.odin",string),4)
-   fmt.print(result)
-   if finished{
-      fmt.println(" <Finished successfully>")
-   }else{
-      fmt.println("<Aborted due to reaching iteration limit>")
-   }
-
-   test_how_to_get_value_from_compiletime_value(nil)
-   test_how_to_get_value_from_compiletime_proc(nil)
-   test_how_to_stringify_value(nil)
-   test_how_to_stringify_u8(nil)
-   test_how_to_assert(nil)
-   test_how_to_buffer(nil)
-   test_how_to_fibonacci(nil)
-   test_how_to_globals(nil)
 }
