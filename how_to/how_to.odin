@@ -17,6 +17,11 @@ how_to_get_value_from_compiletime_proc::proc($exp:uint)->int{
    return comp.v(pow2(exp),"v").v
 }
 
+how_to_typed_to_untyped::proc($typed:typeid/comp.Int($v))->int{
+   //TODO can i use `len` on something? or another intrinsic?
+   return 0
+}
+
 how_to_stringify_value::proc($v:int)->string{
    //PACKAGE::Int(v:$$v)
    full::comp.n(comp.Int(v))
@@ -58,20 +63,39 @@ how_to_fibonacci::proc($i:uint)->u128{
 }
 
 //`content` can be `#load(<filename>,string)` or any compiletime string
-//NOTE(sobex) initial iterations_left is *magic* and probably 27 but might be lower or higher or idk :mageBill: (its probably something related to `when` or `comp.v` depth)
+//NOTE(sobex) initial iterations_left is *magic* and probably 21 on windows for globals but might be lower or higher :mageBill: (its avoiding a stack overflow so its some amount of when depth and type depth)
 how_to_globals::proc($content:string,$depth:uint)->(_result:string,_finished:bool){
-   ITERATION_LIMIT::27
    INIT::comp.Globals_State(content,0,"",0,false)
    when depth==0{
-      result::comp.v(comp.Globals_Core(INIT,ITERATION_LIMIT),"v")
+      result::comp.v(comp.Globals_Core(INIT,22),"v")
    }else when depth==1{
-      result::comp.v(comp.Globals_1(INIT,ITERATION_LIMIT),"v")
+      result::comp.v(comp.Globals_1(INIT,21),"v")
    }else when depth==2{
-      result::comp.v(comp.Globals_2(INIT,ITERATION_LIMIT),"v")
+      result::comp.v(comp.Globals_2(INIT,21),"v")
    }else when depth==3{
-      result::comp.v(comp.Globals_3(INIT,ITERATION_LIMIT),"v")
+      result::comp.v(comp.Globals_3(INIT,21),"v")
    }else{
-      result::comp.v(comp.Globals_4(INIT,ITERATION_LIMIT),"v")
+      result::comp.v(comp.Globals_4(INIT,21),"v")
    }
    return result.result,result.finished
+}
+
+how_to_calculator::proc(){
+   //TODO calculator how to
+}
+
+how_to_assemble::proc($COUNT:uint,$EXPRESSION:string,a,b:int)->(result:int,assembly:string){
+   ASM::comp.v(comp.Assembler(COUNT,EXPRESSION),"v")
+
+   calc::proc(a,b:int)->int{
+      return asm(int,int)->int#intel{
+         ASM.asm_string,
+         ASM.constraints_string
+      }(a,b)
+   }
+
+   result=calc(a,b)
+   assembly=comp.n(ASM)
+
+   return result,assembly
 }

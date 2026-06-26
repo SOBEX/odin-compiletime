@@ -31,6 +31,7 @@ The new method is
 ```
 which gives you access to the full range of 128-bit integers and any other builtin type like floats and strings, as well as most structs.
 
+If you are fine with a runtime result you can use regular polymorphic procedures to a degree, the odin checker has an easier time checking them but llvm codegen might bloat while inlining.
 ---
 
 Compiletime calculations cannot be wrapped in procedures so these how_to procedures are presented as code snippets to copy.

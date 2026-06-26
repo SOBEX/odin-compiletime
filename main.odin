@@ -5,6 +5,8 @@ PACKAGE::"odin_compiletime"
 import "base:intrinsics"
 
 v::intrinsics.type_field_type
+p::intrinsics.procedure_of
+r::intrinsics.type_proc_return_type
 n::intrinsics.type_canonical_name
 
 //None::struct(v:void){}
@@ -350,6 +352,9 @@ U8_OFFSET::len(U8_PREFIX)
 INT_PREFIX::PACKAGE+"::Int(v:$$"
 INT_OFFSET::len(INT_PREFIX)
 
+F64_PREFIX::PACKAGE+"::F64(v:$$"
+F64_OFFSET::len(F64_PREFIX)
+
 //NOTE(sobex) [N]u8 needs exponentially long to typecheck
 Buffer::struct(v:string){}
 
@@ -430,27 +435,25 @@ Fibonacci::struct(i:uint){
 
 Globals_State::struct(remaining:string,depth:uint,result:string,steps:uint,finished:bool){}
 
-GLOBALS_CORE_ITERATIONS_NEEDED::7
-
 //this is a bad implementation and doesnt check if a curly brace is in a comment or string, but shows off iterative state machines and how to avoid hitting the recursion limit
 Globals_Core::struct(s:/*Globals_State*/typeid,iterations_left:uint){
    v:/*Globals_State*/(
       (
          s
-      )when iterations_left<GLOBALS_CORE_ITERATIONS_NEEDED else(
+      )when iterations_left<=0 else(
          s
       )when s.finished else(
          (
             Globals_State(s.remaining,s.depth,s.result,s.steps+1,true)
          )when s.depth==0 else(
-            Globals_State(s.remaining,s.depth.s.result+"<EOF reached before End of Global>",s.steps+1,true)
+            Globals_State(s.remaining,s.depth,s.result+"<EOF reached before End of Global>",s.steps+1,true)
          )
       )when len(s.remaining)==0 else(
          (
             v(Globals_Core(Globals_State(s.remaining[1:],s.depth+1,s.result when s.depth!=0 else (s.result+"{"),s.steps+1,s.finished),iterations_left-1),"v")
          )when s.remaining[0]=='{' else(
             (
-               Globals_State(s.remaining,s.depth.s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
+               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
             )when s.depth==0 else(
                v(Globals_Core(Globals_State(s.remaining[1:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
             )
@@ -458,7 +461,7 @@ Globals_Core::struct(s:/*Globals_State*/typeid,iterations_left:uint){
             v(Globals_Core(Globals_State(s.remaining[2:],s.depth+1,s.result when s.depth!=0 else (s.result+s.remaining[:1]+"{"),s.steps+1,s.finished),iterations_left-1),"v")
          )when s.remaining[1]=='{' else(
             (
-               Globals_State(s.remaining,s.depth.s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
+               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
             )when s.depth==0 else(
                v(Globals_Core(Globals_State(s.remaining[2:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
             )
@@ -466,7 +469,7 @@ Globals_Core::struct(s:/*Globals_State*/typeid,iterations_left:uint){
             v(Globals_Core(Globals_State(s.remaining[3:],s.depth+1,s.result when s.depth!=0 else (s.result+s.remaining[:2]+"{"),s.steps+1,s.finished),iterations_left-1),"v")
          )when s.remaining[2]=='{' else(
             (
-               Globals_State(s.remaining,s.depth.s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
+               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
             )when s.depth==0 else(
                v(Globals_Core(Globals_State(s.remaining[3:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
             )
@@ -474,19 +477,20 @@ Globals_Core::struct(s:/*Globals_State*/typeid,iterations_left:uint){
             v(Globals_Core(Globals_State(s.remaining[4:],s.depth+1,s.result when s.depth!=0 else (s.result+s.remaining[:3]+"{"),s.steps+1,s.finished),iterations_left-1),"v")
          )when s.remaining[3]=='{' else(
             (
-               Globals_State(s.remaining,s.depth.s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
+               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
             )when s.depth==0 else(
                v(Globals_Core(Globals_State(s.remaining[4:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
             )
          )when s.remaining[3]=='}' else(
             v(Globals_Core(Globals_State(s.remaining[4:],s.depth,s.result when s.depth!=0 else (s.result+s.remaining[:4]),s.steps+1,s.finished),iterations_left-1),"v")
          )
-      )when len(s.remaining)>4 else(
+      //NOTE(sobex) compiletime `&&` seems to not short circuit so `when len(s.remaining)>=4&&s.remaining[3]=='X'` fails
+      )when len(s.remaining)>=4 else(
          (
             v(Globals_Core(Globals_State(s.remaining[1:],s.depth+1,s.result when s.depth!=0 else (s.result+"{"),s.steps+1,s.finished),iterations_left-1),"v")
          )when s.remaining[0]=='{' else(
             (
-               Globals_State(s.remaining,s.depth.s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
+               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
             )when s.depth==0 else(
                v(Globals_Core(Globals_State(s.remaining[1:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
             )
@@ -501,7 +505,7 @@ Globals_1::struct(s:/*Globals_State*/typeid,iterations_left:uint){
    v:/*Globals_State*/(
       (
          s
-      )when iterations_left<GLOBALS_CORE_ITERATIONS_NEEDED+1 else(
+      )when iterations_left<=1 else(
          s
       )when s.finished else(
          v(Globals_1(v(Globals_Core(s,iterations_left-1),"v"),iterations_left-1),"v")
@@ -513,7 +517,7 @@ Globals_2::struct(s:/*Globals_State*/typeid,iterations_left:uint){
    v:/*Globals_State*/(
       (
          s
-      )when iterations_left<GLOBALS_CORE_ITERATIONS_NEEDED+2 else(
+      )when iterations_left<=2 else(
          s
       )when s.finished else(
          v(Globals_2(v(Globals_1(s,iterations_left-1),"v"),iterations_left-1),"v")
@@ -525,7 +529,7 @@ Globals_3::struct(s:/*Globals_State*/typeid,iterations_left:uint){
    v:/*Globals_State*/(
       (
          s
-      )when iterations_left<GLOBALS_CORE_ITERATIONS_NEEDED+3 else(
+      )when iterations_left<=3 else(
          s
       )when s.finished else(
          v(Globals_3(v(Globals_2(s,iterations_left-1),"v"),iterations_left-1),"v")
@@ -537,10 +541,129 @@ Globals_4::struct(s:/*Globals_State*/typeid,iterations_left:uint){
    v:/*Globals_State*/(
       (
          s
-      )when iterations_left<GLOBALS_CORE_ITERATIONS_NEEDED+4 else(
+      )when iterations_left<=4 else(
          s
       )when s.finished else(
          v(Globals_4(v(Globals_3(s,iterations_left-1),"v"),iterations_left-1),"v")
+      )
+   )
+}
+
+Calculator_Node_Type::enum{
+   Invalid,
+   Multiplication,
+   Division,
+   Addition,
+   Subtraction,
+   Number
+}
+
+Calculator_Node::struct(type:Calculator_Node_Type){}
+
+Calculator_Node_Invalid::struct(type:Calculator_Node_Type){}
+
+Calculator_Node_Multiplication::struct(type:Calculator_Node_Type,ml,mr:typeid){}
+
+Calculator_Node_Division::struct(type:Calculator_Node_Type,dl,dr:typeid){}
+
+Calculator_Node_Addition::struct(type:Calculator_Node_Type,al,ar:typeid){}
+
+Calculator_Node_Subtraction::struct(type:Calculator_Node_Type,sl,sr:typeid){}
+
+Calculator_Node_Number::struct(type:Calculator_Node_Type,n:f64,ok:bool){}
+
+//NOTE(sobex) Division needs the f64 cast https://github.com/odin-lang/Odin/issues/6866
+Calculator_Calculator::struct(node:/*Calculator_Node*/typeid){
+   v:/*Calculator_Node_Number*/(
+      (
+         /*TODO do we need invalid?*/Calculator_Node_Number(.Number,0,false)
+      )when node.type==.Invalid else(
+         Calculator_Node_Number(.Number,v(Calculator_Calculator(node.ml),"v").n*v(Calculator_Calculator(node.mr),"v").n,true)
+      )when node.type==.Multiplication else(
+         Calculator_Node_Number(.Number,f64(v(Calculator_Calculator(node.dl),"v").n)/v(Calculator_Calculator(node.dr),"v").n,true)
+      )when node.type==.Division else(
+         Calculator_Node_Number(.Number,v(Calculator_Calculator(node.al),"v").n+v(Calculator_Calculator(node.ar),"v").n,true)
+      )when node.type==.Addition else(
+         Calculator_Node_Number(.Number,v(Calculator_Calculator(node.sl),"v").n-v(Calculator_Calculator(node.sr),"v").n,true)
+      )when node.type==.Subtraction else(
+         node
+      )
+   )
+}
+
+Calculator_Parser_Digits::[?]f64{0.1,0.01,0.001,0.0001,0.0001,0.00001,0.000001,0.0000001,0.00000001}
+
+Calculator_Parser_State::struct(expression:string,number:uint,seen_dot:bool,float:uint){}
+
+Calculator_Parser::struct(expression:string,number:uint,seen_dot:bool,float:uint,float_digits:uint,result:typeid){
+   v:/*Calculator_Node*/(
+      (
+         /*TODO finish number and add to left*/Calculator_Node_Number(.Number,0,false)
+      )when len(expression)==0 else(
+         /*TODO add digit to number*/Calculator_Node_Number(.Number,0,false)
+      )when !seen_dot&&(expression[0]=='0'||expression[0]=='1'||expression[0]=='2'||expression[0]=='3'||expression[0]=='4'||expression[0]=='5'||expression[0]=='6'||expression[0]=='7'||expression[0]=='8'||expression[0]=='9') else(
+         /*TODO add digit to float maybe add a fraction that i/=10 each step*/Calculator_Node_Number(.Number,0,false)
+      )when seen_dot&&(expression[0]=='0'||expression[0]=='1'||expression[0]=='2'||expression[0]=='3'||expression[0]=='4'||expression[0]=='5'||expression[0]=='6'||expression[0]=='7'||expression[0]=='8'||expression[0]=='9') else(
+         /*TODO set seen_dot*/Calculator_Node_Number(.Number,0,false)
+      )when !seen_dot&&expression[0]=='.' else(
+         /*TODO error*/Calculator_Node_Number(.Number,0,false)
+      )when seen_dot&&expression[0]=='.' else(
+         /*TODO finish number and add to left*/Calculator_Node_Number(.Number,0,false)
+      )when expression[0]=='*' else(
+         /*TODO finish number and add to left*/Calculator_Node_Number(.Number,0,false)
+      )when expression[0]=='/' else(
+         /*TODO finish number and add to left if its type isnt mul or div*/Calculator_Node_Number(.Number,0,false)
+      )when expression[0]=='+' else(
+         /*TODO finish number and add to left if its type isnt mul or div*/Calculator_Node_Number(.Number,0,false)
+      )when expression[0]=='-' else(
+         /*TODO skip whitespace and others*/Calculator_Node_Number(.Number,0,false)
+      )
+   )
+}
+
+Calculator::struct(expression:string){
+   v:v(Calculator_Calculator(v(Calculator_Parser(expression,0,false,0,0,Calculator_Node_Invalid(.Invalid)),"v")),"v")
+}
+
+Assembly::struct(
+   asm_string:string,
+   constraints_string:string
+){}
+
+_Assembler::struct(count:u8,expression:string,registers:string,stack:string,asm_string:string,constraints_string:string,clobbers:bool){
+   v:/*Assembly*/(
+      (
+         Assembly(asm_string+"mov $0, "+registers[3*stack[0]:3*(stack[0]+1)],constraints_string when !clobbers else constraints_string+",~{cc}")
+      )when len(expression)==0 else(
+         v(_Assembler(count+1,expression[1:],registers,RUNES[count]+stack[2:],asm_string+"mov "+registers[3*count:3*(count+1)]+", "+registers[3*stack[0]:3*(stack[0]+1)]+"\nimul "+registers[3*count:3*(count+1)]+", "+registers[3*stack[1]:3*(stack[1]+1)]+"\n",constraints_string+",~{"+registers[3*count:3*(count+1)]+"}",true),"v")
+      )when expression[0]=='*' else(
+         v(_Assembler(count+1,expression[1:],registers,RUNES[count]+stack[2:],asm_string+"lea "+registers[3*count:3*(count+1)]+", ["+registers[3*stack[0]:3*(stack[0]+1)]+" + "+registers[3*stack[1]:3*(stack[1]+1)]+"]\n",constraints_string+",~{"+registers[3*count:3*(count+1)]+"}",clobbers),"v")
+      )when expression[0]=='+' else(
+         v(_Assembler(count+1,expression[1:],registers,RUNES[count]+stack[2:],asm_string+"mov "+registers[3*count:3*(count+1)]+", "+registers[3*stack[0]:3*(stack[0]+1)]+"\nsub "+registers[3*count:3*(count+1)]+", "+registers[3*stack[1]:3*(stack[1]+1)]+"\n",constraints_string+",~{"+registers[3*count:3*(count+1)]+"}",clobbers),"v")
+      )when expression[0]=='-' else(
+         v(_Assembler(count,expression[1:],registers,RUNES[expression[0]-'0']+stack,asm_string,constraints_string,clobbers),"v")
+      )when expression[0]=='0'||expression[0]=='1'||expression[0]=='2'||expression[0]=='3'||expression[0]=='4'||expression[0]=='5'||expression[0]=='6'||expression[0]=='7'||expression[0]=='8'||expression[0]=='9' else(
+         v(_Assembler(count,expression[1:],registers,stack,asm_string,constraints_string,clobbers),"v")
+      )
+   )
+}
+
+Assembler_Scratch::"r8 r9 r10r11r12r13r14r15"
+
+Assembler::struct(count:uint,expression:string){
+   v:/*Assembly*/(
+      (
+         v(_Assembler(1,expression,"$0 "+Assembler_Scratch,"","","=r",false),"v")
+      )when count==0 else(
+         v(_Assembler(2,expression,"$0 $1 "+Assembler_Scratch,"","","=r,r",false),"v")
+      )when count==1 else(
+         v(_Assembler(3,expression,"$0 $1 $2 "+Assembler_Scratch,"","","=r,r,r",false),"v")
+      )when count==2 else(
+         v(_Assembler(4,expression,"$0 $1 $2 $3 "+Assembler_Scratch,"","","=r,r,r,r",false),"v")
+      )when count==3 else(
+         v(_Assembler(5,expression,"$0 $1 $2 $3 $4 "+Assembler_Scratch,"","","=r,r,r,r,r",false),"v")
+      )when count==4 else(
+         #panic("more than 4 inputs not yet supported, but feel free to add the single line you need here")
       )
    )
 }

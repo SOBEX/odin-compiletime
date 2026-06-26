@@ -8,6 +8,9 @@ import "core:fmt"
 import "core:log"
 import "core:testing"
 
+//NOTE(sobex) some tests arent designed to run on the default windows 1MB stacksize, this enables them and assumes `/STACK:8388608,1048576`
+BIG_STACK::bool(#config(BIG_STACK,ODIN_OS!=.Windows))
+
 @test test_how_to_get_value_from_compiletime_value::proc(t:^testing.T){
    testing.expect_value(t,how.how_to_get_value_from_compiletime_value(comp.Int(1234567890)),1234567890)
 }
@@ -66,6 +69,32 @@ main::proc(){...}
    testing.expect_value(t,result,expected)
 }
 
+@test test_how_to_calculator::proc(t:^testing.T){
+   when BIG_STACK{
+      //TODO calculator test
+      testing.expect_value(t,BIG_STACK,true)
+   }
+}
+
+@test test_how_to_assemble::proc(t:^testing.T){
+   COUNT::2
+   EXPRESSION::"21+21*-"
+
+   correct_calc::proc(a,b:int)->int{
+      return (a*b)-(a+b)
+   }
+
+   _,assembly:=how.how_to_assemble(COUNT,EXPRESSION,0,0)
+
+   for a in -10..=10{
+      for b in -10..=10{
+         result,_:=how.how_to_assemble(COUNT,EXPRESSION,a,b)
+         expected:=correct_calc(a,b)
+         testing.expect_value(t,result,expected)
+      }
+   }
+}
+
 when !ODIN_TEST{
    main::#force_no_inline proc(){
       console_logger:=log.create_console_logger()
@@ -86,13 +115,15 @@ when !ODIN_TEST{
 
       fmt.println(how.how_to__general_notes())
 
-      result,finished:=how.how_to_globals(#load("../main.odin",string),4)
-      fmt.print(result)
-      if finished{
-         fmt.println(" <Finished successfully>")
-      }else{
-         fmt.println("<Aborted due to reaching iteration limit>")
-      }
+      when true{{
+         result,finished:=how.how_to_globals(#load("../main.odin",string),4)
+         fmt.print(result)
+         if finished{
+            fmt.println(" <Finished successfully>")
+         }else{
+            fmt.println("<Aborted due to reaching iteration limit>")
+         }
+      }}
 
       test_how_to_get_value_from_compiletime_value(nil)
       test_how_to_get_value_from_compiletime_proc(nil)
@@ -102,5 +133,17 @@ when !ODIN_TEST{
       test_how_to_buffer(nil)
       test_how_to_fibonacci(nil)
       test_how_to_globals(nil)
+      test_how_to_calculator(nil)
+      test_how_to_assemble(nil)
+
+      fmt.println(comp.v(comp.Calculator_Calculator(
+         comp.Calculator_Node_Division(.Division,
+            comp.Calculator_Node_Number(.Number,0.000000000000000025,true),
+            comp.Calculator_Node_Number(.Number,1e307,true)
+         )
+      ),"v").n)
+      expression::"1+2*3"
+      result::comp.v(comp.Calculator(expression),"v").n
+      fmt.println(expression,result)
    }
 }
