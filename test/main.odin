@@ -38,6 +38,13 @@ BIG_STACK::bool(#config(BIG_STACK,ODIN_OS!=.Windows))
    testing.expect_value(t,escaped,"[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,33,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]")
 }
 
+@test test_how_to_pack::proc(t:^testing.T){
+   INPUT::i32(0x1234567)
+   compiletime,runtime:=how.how_to_pack(INPUT)
+   testing.expect_value(t,compiletime,INPUT)
+   testing.expect_value(t,runtime,INPUT)
+}
+
 @test test_how_to_fibonacci::proc(t:^testing.T){
    testing.expect_value(t,how.how_to_fibonacci(185),205697230343233228174223751303346572685)
 }
@@ -135,6 +142,7 @@ when !ODIN_TEST{
       test_how_to_globals(nil)
       test_how_to_calculator(nil)
       test_how_to_assemble(nil)
+      test_how_to_pack(nil)
 
       fmt.println(comp.v(comp.Calculator_Calculator(
          comp.Calculator_Node_Division(.Division,

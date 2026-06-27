@@ -58,6 +58,14 @@ how_to_buffer::proc($length:uint,$index:uint,$value:u8)->(_buffer:string,_found:
    return modified,found,escaped
 }
 
+how_to_pack::proc($value:i32)->(compiletime:i32,runtime:i32){
+   buffer::comp.v(comp.Pack(size_of(i32),u128(transmute(u32)value)),"v").v
+   compiletime=i32(comp.v(comp.Unpack(size_of(i32),buffer),"v").v)
+   runtime_buffer:=buffer
+   runtime=(cast(^i32)raw_data(runtime_buffer))^
+   return compiletime,runtime
+}
+
 how_to_fibonacci::proc($i:uint)->u128{
    return comp.v(comp.Fibonacci(i),"v").v
 }

@@ -349,11 +349,17 @@ RUNES::[256]string{
 U8_PREFIX::PACKAGE+"::U8(v:$$"
 U8_OFFSET::len(U8_PREFIX)
 
-INT_PREFIX::PACKAGE+"::Int(v:$$"
-INT_OFFSET::len(INT_PREFIX)
+U128_PREFIX::PACKAGE+"::U128(v:$$"
+U128_OFFSET::len(U128_PREFIX)
 
 F64_PREFIX::PACKAGE+"::F64(v:$$"
 F64_OFFSET::len(F64_PREFIX)
+
+INT_PREFIX::PACKAGE+"::Int(v:$$"
+INT_OFFSET::len(INT_PREFIX)
+
+UINT_PREFIX::PACKAGE+"::Uint(v:$$"
+UINT_OFFSET::len(UINT_PREFIX)
 
 //NOTE(sobex) [N]u8 needs exponentially long to typecheck
 Buffer::struct(v:string){}
@@ -390,6 +396,88 @@ Buffer_Print::struct(buffer:string){
          n(U8(buffer[0]))[U8_OFFSET:len(n(U8(buffer[0])))-1]
       )when len(buffer)==1 else(
          v(Buffer_Print(buffer[:len(buffer)/2]),"v").v+","+v(Buffer_Print(buffer[len(buffer)/2:]),"v").v
+      )
+   )
+}
+
+Pack::struct(size:uint,value:u128){
+   v:Buffer(
+      (
+         RUNES[value&0xFF]
+      )when size==1 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]
+      )when size==2 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]
+      )when size==3 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]
+      )when size==4 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]
+      )when size==5 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]
+      )when size==6 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]
+      )when size==7 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]
+      )when size==8 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]
+      )when size==9 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]
+      )when size==10 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]+RUNES[(value>>80)&0xFF]
+      )when size==11 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]+RUNES[(value>>80)&0xFF]+RUNES[(value>>88)&0xFF]
+      )when size==12 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]+RUNES[(value>>80)&0xFF]+RUNES[(value>>88)&0xFF]+RUNES[(value>>96)&0xFF]
+      )when size==13 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]+RUNES[(value>>80)&0xFF]+RUNES[(value>>88)&0xFF]+RUNES[(value>>96)&0xFF]+RUNES[(value>>104)&0xFF]
+      )when size==14 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]+RUNES[(value>>80)&0xFF]+RUNES[(value>>88)&0xFF]+RUNES[(value>>96)&0xFF]+RUNES[(value>>104)&0xFF]+RUNES[(value>>112)&0xFF]
+      )when size==15 else(
+         RUNES[value&0xFF]+RUNES[(value>>8)&0xFF]+RUNES[(value>>16)&0xFF]+RUNES[(value>>24)&0xFF]+RUNES[(value>>32)&0xFF]+RUNES[(value>>40)&0xFF]+RUNES[(value>>48)&0xFF]+RUNES[(value>>56)&0xFF]+RUNES[(value>>64)&0xFF]+RUNES[(value>>72)&0xFF]+RUNES[(value>>80)&0xFF]+RUNES[(value>>88)&0xFF]+RUNES[(value>>96)&0xFF]+RUNES[(value>>104)&0xFF]+RUNES[(value>>112)&0xFF]+RUNES[(value>>120)&0xFF]
+      )when size==16 else(
+         #panic("pack size "+n(Uint(size))[UINT_OFFSET:len(n(Uint(size)))-1]+" > 16")
+      )
+   )
+}
+
+Unpack::struct(size:uint,buffer:string){
+   v:U128(
+      (
+         #panic("buffer \""+buffer+"\" shorter than requested size "+n(Uint(size))[UINT_OFFSET:len(n(Uint(size)))-1])
+      )when len(buffer)<size else(
+         u128(buffer[0])
+      )when size==1 else(
+         u128(buffer[0])+u128(buffer[1])<<8
+      )when size==2 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16
+      )when size==3 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24
+      )when size==4 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32
+      )when size==5 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40
+      )when size==6 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48
+      )when size==7 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56
+      )when size==8 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64
+      )when size==9 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72
+      )when size==10 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80
+      )when size==11 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80+u128(buffer[11])<<88
+      )when size==12 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80+u128(buffer[11])<<88+u128(buffer[12])<<96
+      )when size==13 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80+u128(buffer[11])<<88+u128(buffer[12])<<96+u128(buffer[13])<<104
+      )when size==14 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80+u128(buffer[11])<<88+u128(buffer[12])<<96+u128(buffer[13])<<104+u128(buffer[14])<<112
+      )when size==15 else(
+         u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80+u128(buffer[11])<<88+u128(buffer[12])<<96+u128(buffer[13])<<104+u128(buffer[14])<<112+u128(buffer[15])<<120
+      )when size==16 else(
+         #panic("unpack size "+n(Uint(size))[UINT_OFFSET:len(n(Uint(size)))-1]+" > 16")
       )
    )
 }
@@ -484,7 +572,7 @@ Globals_Core::struct(s:/*Globals_State*/typeid,iterations_left:uint){
          )when s.remaining[3]=='}' else(
             v(Globals_Core(Globals_State(s.remaining[4:],s.depth,s.result when s.depth!=0 else (s.result+s.remaining[:4]),s.steps+1,s.finished),iterations_left-1),"v")
          )
-      //NOTE(sobex) compiletime `&&` seems to not short circuit so `when len(s.remaining)>=4&&s.remaining[3]=='X'` fails
+      //NOTE(sobex) compiletime `&&` seems to not short circuit so `when len(s.remaining)>3&&s.remaining[3]=='X'` fails
       )when len(s.remaining)>=4 else(
          (
             v(Globals_Core(Globals_State(s.remaining[1:],s.depth+1,s.result when s.depth!=0 else (s.result+"{"),s.steps+1,s.finished),iterations_left-1),"v")
@@ -668,40 +756,44 @@ Assembler::struct(count:uint,expression:string){
    )
 }
 
+_MAGEBILL::"\e[0m\n"+
+           "\e[40m           \e[44m        \e[40m           \e[0m\n"+
+           "\e[40m          \e[44m          \e[40m          \e[0m\n"+
+           "\e[40m         \e[44m         \e[40m            \e[0m\n"+
+           "\e[40m     \e[44m    \e[45m         \e[44m     \e[40m       \e[0m\n"+
+           "\e[40m   \e[44m                      \e[40m     \e[0m\n"+
+           "\e[40m  \e[44m     \e[47m           \e[43m   \e[44m     \e[40m    \e[0m\n"+
+           "\e[40m  \e[44m     \e[47m           \e[43m   \e[44m  \e[46m     \e[40m  \e[0m\n"+
+           "\e[40m   \e[44m    \e[47m           \e[43m   \e[44m \e[46m       \e[40m \e[0m\n"+
+           "\e[40m       \e[47m           \e[43m   \e[40m  \e[46m     \e[40m  \e[0m\n"+
+           "\e[40m       \e[47m \e[43m       \e[47m  \e[43m   \e[40m    \e[43m   \e[40m   \e[0m\n"+
+           "\e[40m       \e[43m  \e[47m     \e[43m    \e[47m  \e[40m    \e[43m   \e[40m   \e[0m\n"+
+           "\e[40m       \e[43m          \e[47m   \e[40m    \e[43m   \e[40m   \e[0m\n"+
+           "\e[40m        \e[47m            \e[40m    \e[43m   \e[40m   \e[0m\n"+
+           "\e[40m      \e[44m  \e[47m            \e[44m   \e[40m \e[43m   \e[40m   \e[0m\n"+
+           "\e[40m  \e[44m       \e[47m          \e[44m     \e[43m   \e[40m   \e[0m\n"+
+           "\e[40m \e[44m                       \e[43m   \e[40m   \e[0m\n"
+
+_MAGEBILLASCII::"\e[0m\n"+
+                "\e[30m           \e[34m,-----..\e[30m           \e[0m\n"+
+                "\e[30m          \e[34m:       .'\e[30m          \e[0m\n"+
+                "\e[30m         \e[34m:       :\e[30m            \e[0m\n"+
+                "\e[30m     \e[34m.--'\e[35m#########\e[34m'---.\e[30m       \e[0m\n"+
+                "\e[30m   \e[34m,---.============.---,\e[30m     \e[0m\n"+
+                "\e[30m  \e[34m:    \e[37m:          \e[33m###\e[34m    :\e[30m    \e[0m\n"+
+                "\e[30m  \e[34m:    \e[37m:          \e[33m###\e[34m  \e[36m.---.\e[30m  \e[0m\n"+
+                "\e[30m   \e[34m'---\e[37m:          \e[33m###\e[34m-\e[36m:     :\e[30m \e[0m\n"+
+                "\e[30m       \e[37m:          \e[33m###\e[30m  \e[36m:___:\e[30m  \e[0m\n"+
+                "\e[30m       \e[37m:\e[33m#######\e[37m  \e[33m##:\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+                "\e[30m       \e[33m##\e[37m     \e[33m####\e[37m .\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+                "\e[30m       \e[33m'#########\e[37m  :\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+                "\e[30m        \e[37m:          .\e[30m    \e[33m: :\e[30m   \e[0m\n"+
+                "\e[30m      \e[34m.:\e[37m:          .\e[34m::.\e[30m \e[33m: :\e[30m   \e[0m\n"+
+                "\e[30m  \e[34m..-=   \e[37m'--------'\e[34m    =\e[33m: :\e[30m   \e[0m\n"+
+                "\e[30m \e[34m:______________________\e[33m:_:\e[30m   \e[0m\n"
+
 when #config(MAGEBILL,false){
-   #panic("\e[0m\n"+
-          "\e[40m           \e[44m        \e[40m           \e[0m\n"+
-          "\e[40m          \e[44m          \e[40m          \e[0m\n"+
-          "\e[40m         \e[44m         \e[40m            \e[0m\n"+
-          "\e[40m     \e[44m    \e[45m         \e[44m     \e[40m       \e[0m\n"+
-          "\e[40m   \e[44m                      \e[40m     \e[0m\n"+
-          "\e[40m  \e[44m     \e[47m           \e[43m   \e[44m     \e[40m    \e[0m\n"+
-          "\e[40m  \e[44m     \e[47m           \e[43m   \e[44m  \e[46m     \e[40m  \e[0m\n"+
-          "\e[40m   \e[44m    \e[47m           \e[43m   \e[44m \e[46m       \e[40m \e[0m\n"+
-          "\e[40m       \e[47m           \e[43m   \e[40m  \e[46m     \e[40m  \e[0m\n"+
-          "\e[40m       \e[47m \e[43m       \e[47m  \e[43m   \e[40m    \e[43m   \e[40m   \e[0m\n"+
-          "\e[40m       \e[43m  \e[47m     \e[43m    \e[47m  \e[40m    \e[43m   \e[40m   \e[0m\n"+
-          "\e[40m       \e[43m          \e[47m   \e[40m    \e[43m   \e[40m   \e[0m\n"+
-          "\e[40m        \e[47m            \e[40m    \e[43m   \e[40m   \e[0m\n"+
-          "\e[40m      \e[44m  \e[47m            \e[44m   \e[40m \e[43m   \e[40m   \e[0m\n"+
-          "\e[40m  \e[44m       \e[47m          \e[44m     \e[43m   \e[40m   \e[0m\n"+
-          "\e[40m \e[44m                       \e[43m   \e[40m   \e[0m\n")
+   #panic(_MAGEBILL)
 }else when #config(MAGEBILLASCII,false){
-   #panic("\e[0m\n"+
-          "\e[30m           \e[34m,-----..\e[30m           \e[0m\n"+
-          "\e[30m          \e[34m:       .'\e[30m          \e[0m\n"+
-          "\e[30m         \e[34m:       :\e[30m            \e[0m\n"+
-          "\e[30m     \e[34m.--'\e[35m#########\e[34m'---.\e[30m       \e[0m\n"+
-          "\e[30m   \e[34m,---.============.---,\e[30m     \e[0m\n"+
-          "\e[30m  \e[34m:    \e[37m:          \e[33m###\e[34m    :\e[30m    \e[0m\n"+
-          "\e[30m  \e[34m:    \e[37m:          \e[33m###\e[34m  \e[36m.---.\e[30m  \e[0m\n"+
-          "\e[30m   \e[34m'---\e[37m:          \e[33m###\e[34m-\e[36m:     :\e[30m \e[0m\n"+
-          "\e[30m       \e[37m:          \e[33m###\e[30m  \e[36m:___:\e[30m  \e[0m\n"+
-          "\e[30m       \e[37m:\e[33m#######\e[37m  \e[33m##:\e[30m    \e[33m: :\e[30m   \e[0m\n"+
-          "\e[30m       \e[33m##\e[37m     \e[33m####\e[37m .\e[30m    \e[33m: :\e[30m   \e[0m\n"+
-          "\e[30m       \e[33m'#########\e[37m  :\e[30m    \e[33m: :\e[30m   \e[0m\n"+
-          "\e[30m        \e[37m:          .\e[30m    \e[33m: :\e[30m   \e[0m\n"+
-          "\e[30m      \e[34m.:\e[37m:          .\e[34m::.\e[30m \e[33m: :\e[30m   \e[0m\n"+
-          "\e[30m  \e[34m..-=   \e[37m'--------'\e[34m    =\e[33m: :\e[30m   \e[0m\n"+
-          "\e[30m \e[34m:______________________\e[33m:_:\e[30m   \e[0m\n")
+   #panic(_MAGEBILLASCII)
 }
