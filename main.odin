@@ -348,18 +348,121 @@ RUNES::[256]string{
 
 U8_PREFIX::PACKAGE+"::U8(v:$$"
 U8_OFFSET::len(U8_PREFIX)
+Stringify_U8::struct(value:u8){
+   v:String(n(U8(value))[U8_OFFSET:len(n(U8(value)))-1])
+}
 
 U128_PREFIX::PACKAGE+"::U128(v:$$"
 U128_OFFSET::len(U128_PREFIX)
+Stringify_U128::struct(value:u128){
+   v:String(n(U128(value))[U128_OFFSET:len(n(U128(value)))-1])
+}
 
 F64_PREFIX::PACKAGE+"::F64(v:$$"
 F64_OFFSET::len(F64_PREFIX)
+Stringify_F64::struct(value:f64){
+   v:String(n(F64(value))[F64_OFFSET:len(n(F64(value)))-1])
+}
 
 INT_PREFIX::PACKAGE+"::Int(v:$$"
 INT_OFFSET::len(INT_PREFIX)
+Stringify_Int::struct(value:int){
+   v:String(n(Int(value))[INT_OFFSET:len(n(Int(value)))-1])
+}
 
 UINT_PREFIX::PACKAGE+"::Uint(v:$$"
 UINT_OFFSET::len(UINT_PREFIX)
+Stringify_Uint::struct(value:uint){
+   v:String(n(Uint(value))[UINT_OFFSET:len(n(Uint(value)))-1])
+}
+
+Pad_Left::struct($str:string,$space:string,$width:uint){
+   v:String(
+      (
+         #panic("string longer than width")
+      )when len(str)>width else(
+         str
+      )when width-len(str)==0 else(
+         space+str
+      )when width-len(str)==1 else(
+         space+space+str
+      )when width-len(str)==2 else(
+         space+space+space+str
+      )when width-len(str)==3 else(
+         space+space+space+space+str
+      )when width-len(str)==4 else(
+         space+space+space+space+space+str
+      )when width-len(str)==5 else(
+         space+space+space+space+space+space+str
+      )when width-len(str)==6 else(
+         space+space+space+space+space+space+space+str
+      )when width-len(str)==7 else(
+         space+space+space+space+space+space+space+space+str
+      )when width-len(str)==8 else(
+         space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==9 else(
+         space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==10 else(
+         space+space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==11 else(
+         space+space+space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==12 else(
+         space+space+space+space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==13 else(
+         space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==14 else(
+         space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==15 else(
+         space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
+      )when width-len(str)==16 else(
+         #panic("pad amount longer than 16 characters")
+      )
+   )
+}
+
+Pad_Right::struct($str:string,$space:string,$width:uint){
+   v:String(
+      (
+         #panic("string longer than width")
+      )when len(str)>width else(
+         str
+      )when width-len(str)==0 else(
+         str+space
+      )when width-len(str)==1 else(
+         str+space+space
+      )when width-len(str)==2 else(
+         str+space+space+space
+      )when width-len(str)==3 else(
+         str+space+space+space+space
+      )when width-len(str)==4 else(
+         str+space+space+space+space+space
+      )when width-len(str)==5 else(
+         str+space+space+space+space+space+space
+      )when width-len(str)==6 else(
+         str+space+space+space+space+space+space+space
+      )when width-len(str)==7 else(
+         str+space+space+space+space+space+space+space+space
+      )when width-len(str)==8 else(
+         str+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==9 else(
+         str+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==10 else(
+         str+space+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==11 else(
+         str+space+space+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==12 else(
+         str+space+space+space+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==13 else(
+         str+space+space+space+space+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==14 else(
+         str+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==15 else(
+         str+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
+      )when width-len(str)==16 else(
+         #panic("pad amount longer than 16 characters")
+      )
+   )
+}
 
 //NOTE(sobex) [N]u8 needs exponentially long to typecheck
 Buffer::struct(v:string){}
@@ -524,7 +627,7 @@ Fibonacci::struct(i:uint){
 Globals_State::struct(remaining:string,depth:uint,result:string,steps:uint,finished:bool){}
 
 //this is a bad implementation and doesnt check if a curly brace is in a comment or string, but shows off iterative state machines and how to avoid hitting the recursion limit
-Globals_Core::struct(s:/*Globals_State*/typeid,iterations_left:uint){
+Globals_Core::struct(s:/*TODO inline this struct Globals_State*/typeid,iterations_left:uint){
    v:/*Globals_State*/(
       (
          s
