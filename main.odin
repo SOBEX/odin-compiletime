@@ -4,6 +4,28 @@ PACKAGE::"odin_compiletime"
 
 import "base:intrinsics"
 
+//NOTE(sobex) the return parameter exists so you can use it in global scope like `_:=comp.ERROR("message")`.
+ERROR::#force_inline proc"contextless"($MESSAGE:string)->bool{
+   #panic("\e[G\e[K"+MESSAGE+"\n")
+   return true
+}
+
+//NOTE(sobex) this warning only works once due each call having the same Source_Code_Location.
+//            if you want multiple warnings copy this snippet for every message you want to display.
+//            ```odin
+//               WARNING_N::proc"contextless"(){
+//                  MESSAGE::"Warning: warning"
+//                  @(deprecated="\e[G\e[K"+MESSAGE+"\n")_WARNING::#force_inline proc"contextless"(){}
+//                  #force_inline _WARNING()
+//               }
+//            ```
+//            the return parameter exists so you can use it in global scope like `_:=comp.WARNING("message")`.
+WARNING::#force_inline proc"contextless"($MESSAGE:string)->bool{
+   @(deprecated="\e[G\e[K"+MESSAGE+"\n")_WARNING::#force_inline proc"contextless"(){}
+   _WARNING()
+   return true
+}
+
 v::intrinsics.type_field_type
 p::intrinsics.procedure_of
 r::intrinsics.type_proc_return_type
@@ -415,7 +437,7 @@ Pad_Left::struct($str:string,$space:string,$width:uint){
       )when width-len(str)==15 else(
          space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
       )when width-len(str)==16 else(
-         #panic("pad amount longer than 16 characters")
+         space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+v(Pad_Left(str,space,width-16),"v").v
       )
    )
 }
@@ -459,7 +481,7 @@ Pad_Right::struct($str:string,$space:string,$width:uint){
       )when width-len(str)==15 else(
          str+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
       )when width-len(str)==16 else(
-         #panic("pad amount longer than 16 characters")
+         v(Pad_Right(str,space,width-16),"v").v+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
       )
    )
 }
@@ -479,14 +501,26 @@ Buffer_Make::struct(length:uint){
    )
 }
 
-Buffer_Find::struct(buffer:string,value:u8,offset:uint){
-   v:Uint(
+Buffer_Find::struct(buffer:string,value:u8,offset:int){
+   v:Int(
       (
-         max(uint)
+         max(int)
       )when len(buffer)==0 else(
-         offset when buffer[0]==value else max(uint)
+         offset when buffer[0]==value else max(int)
       )when len(buffer)==1 else(
          min(v(Buffer_Find(buffer[:len(buffer)/2],value,offset),"v").v,v(Buffer_Find(buffer[len(buffer)/2:],value,offset+len(buffer)/2),"v").v)
+      )
+   )
+}
+
+Buffer_Find_Last::struct(buffer:string,value:u8,offset:int){
+   v:Int(
+      (
+         min(int)
+      )when len(buffer)==0 else(
+         offset when buffer[0]==value else min(int)
+      )when len(buffer)==1 else(
+         max(v(Buffer_Find_Last(buffer[:len(buffer)/2],value,offset),"v").v,v(Buffer_Find_Last(buffer[len(buffer)/2:],value,offset+len(buffer)/2),"v").v)
       )
    )
 }
@@ -859,8 +893,7 @@ Assembler::struct(count:uint,expression:string){
    )
 }
 
-_MAGEBILL::"\e[0m\n"+
-           "\e[40m           \e[44m        \e[40m           \e[0m\n"+
+_MAGEBILL::"\e[40m           \e[44m        \e[40m           \e[0m\n"+
            "\e[40m          \e[44m          \e[40m          \e[0m\n"+
            "\e[40m         \e[44m         \e[40m            \e[0m\n"+
            "\e[40m     \e[44m    \e[45m         \e[44m     \e[40m       \e[0m\n"+
@@ -877,8 +910,7 @@ _MAGEBILL::"\e[0m\n"+
            "\e[40m  \e[44m       \e[47m          \e[44m     \e[43m   \e[40m   \e[0m\n"+
            "\e[40m \e[44m                       \e[43m   \e[40m   \e[0m\n"
 
-_MAGEBILLASCII::"\e[0m\n"+
-                "\e[30m           \e[34m,-----..\e[30m           \e[0m\n"+
+_MAGEBILLASCII::"\e[30m           \e[34m,-----..\e[30m           \e[0m\n"+
                 "\e[30m          \e[34m:       .'\e[30m          \e[0m\n"+
                 "\e[30m         \e[34m:       :\e[30m            \e[0m\n"+
                 "\e[30m     \e[34m.--'\e[35m#########\e[34m'---.\e[30m       \e[0m\n"+
@@ -896,7 +928,7 @@ _MAGEBILLASCII::"\e[0m\n"+
                 "\e[30m \e[34m:______________________\e[33m:_:\e[30m   \e[0m\n"
 
 when #config(MAGEBILL,false){
-   #panic(_MAGEBILL)
+   #panic("\e[G\e[K"+_MAGEBILL)
 }else when #config(MAGEBILLASCII,false){
-   #panic(_MAGEBILLASCII)
+   #panic("\e[G\e[K"+_MAGEBILLASCII)
 }

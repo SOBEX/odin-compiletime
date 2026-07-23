@@ -1,3 +1,14 @@
+To pass around values at compiletime we need to box them in polymorphic structs like `Int::struct(value:int){}`.
+
+We can access their values dynamically with `instance_of_Int.value`.
+
+We can pass these boxed types around as `typeids`.
+
+For polymorphic procs we can use specialization like `int_proc::proc(i:typeid/Int($I))->T{...}` however this does not work for polymorphic structs,
+here i like to put a comment like `Operation::struct(i:/*Int*/typeid){.. i.value ..}`.
+
+---
+
 Generally less deep type recursion is better but it does not matter as much with string buffers.
 
 If you do need deep recursion do avoid fixed size arrays where possible as they bloat type checking immensely.
