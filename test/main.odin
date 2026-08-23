@@ -7,6 +7,7 @@ import "core:fmt"
 import "core:log"
 import "core:strings"
 import "core:testing"
+import "core:time"
 
 main::proc(){
    print_chars()
@@ -16,6 +17,7 @@ main::proc(){
 
    does_empty_pattern_keep_data_pointer(nil)
    test(nil)
+   benchmark(nil)
 }
 
 @test does_empty_pattern_keep_data_pointer::proc(t:^testing.T){
@@ -254,6 +256,58 @@ main::proc(){
    expect(t, "abc123XYZ", "%g*", "", 0, 0, true)
    expect(t, "abc123XYZ!", "%g*!", "!", 9, 10, true)
    expect(t, "abc123XYZ!", "%w*!", "abc123XYZ!", 0, 10, true)
+}
+
+@test benchmark::proc(t:^testing.T){
+   text:=#load("main.odin",string)
+
+   my_lines:[dynamic;1024]string
+   core_lines:[dynamic;1024]string
+   strings_lines:[dynamic;1024]string
+
+   my_text:=text
+   my_start:=time.tick_now()
+   for{
+      line,_,end,was_found:=my_match.match(my_text,"^.*\n")
+      if !was_found{
+         break
+      }
+      append(&my_lines,line)
+      my_text=my_text[end:]
+   }
+   my_end:=time.tick_now()
+
+   core_matcher:=core_match.matcher_init(text,"^.-\n")
+   core_start:=time.tick_now()
+   for line,_ in core_match.matcher_match_iter(&core_matcher){
+      append(&core_lines,line)
+   }
+   core_end:=time.tick_now()
+
+   strings_text:=text
+   strings_start:=time.tick_now()
+   for line in strings.split_lines_iterator(&strings_text){
+      append(&strings_lines,line)
+   }
+   strings_end:=time.tick_now()
+
+   testing.expect_value(t,len(my_lines),len(core_lines))
+   testing.expect_value(t,len(my_lines),len(strings_lines))
+
+   for i in 0..<min(len(my_lines),len(core_lines)){
+      testing.expect_value(t,my_lines[i],core_lines[i])
+   }
+   for i in 0..<min(len(my_lines),len(strings_lines)){
+      testing.expect_value(t,strings.trim_right(my_lines[i],"\r\n"),strings_lines[i])
+   }
+
+   my_duration:=time.tick_diff(my_start,my_end)
+   core_duration:=time.tick_diff(core_start,core_end)
+   strings_duration:=time.tick_diff(strings_start,strings_end)
+
+   fmt.println(my_duration)
+   fmt.println(core_duration)
+   fmt.println(strings_duration)
 }
 
 print_chars::proc(){
