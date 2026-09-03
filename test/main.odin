@@ -2,6 +2,7 @@ package odin_compiletime_test
 
 import comp ".."
 import how "../how_to"
+import scratch "../scratch"
 
 import "base:intrinsics"
 import "core:fmt"
@@ -144,14 +145,14 @@ when !ODIN_TEST{
       test_how_to_assemble(nil)
       test_how_to_pack(nil)
 
-      fmt.println(comp.v(comp.Calculator_Calculator(
-         comp.Calculator_Node_Division(.Division,
-            comp.Calculator_Node_Number(.Number,0.000000000000000025,true),
-            comp.Calculator_Node_Number(.Number,1e307,true)
+      fmt.println(comp.v(scratch.Calculator_Calculator(
+         scratch.Calculator_Node_Division(.Division,
+            scratch.Calculator_Node_Number(.Number,0.000000000000000025,true),
+            scratch.Calculator_Node_Number(.Number,1e307,true)
          )
       ),"v").n)
       expression::"1+2*3"
-      result::comp.v(comp.Calculator(expression),"v").n
+      result::comp.v(scratch.Calculator(expression),"v").n
       fmt.println(expression,result)
    }
 }

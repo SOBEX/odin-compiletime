@@ -109,263 +109,281 @@ F64be::struct(v:f64be){}
 
 Byte::struct(v:byte){}
 
+Mul::struct(l,r:/*I128*/typeid){
+   v:I128(l.v*r.v)
+}
+
+Pow::struct(m:/*I128*/typeid,exp:uint){
+   v:/*I128*/(
+      (
+         I128(1)
+      )when exp==0 else(
+         m
+      )when exp==1 else(
+         v(Pow(v(Mul(m,m),"v"),exp/2),"v")
+      )when exp%2==0 else(
+         v(Mul(v(Pow(m,exp/2),"v"),v(Pow(m,(exp+1)/2),"v")),"v")
+      )
+   )
+}
+
 RUNES::[256]string{
-     0="\x00",
-     1="\x01",
-     2="\x02",
-     3="\x03",
-     4="\x04",
-     5="\x05",
-     6="\x06",
-     7="\x07",
-     8="\x08",
-     9="\x09",
-    10="\x0A",
-    11="\x0B",
-    12="\x0C",
-    13="\x0D",
-    14="\x0E",
-    15="\x0F",
-    16="\x10",
-    17="\x11",
-    18="\x12",
-    19="\x13",
-    20="\x14",
-    21="\x15",
-    22="\x16",
-    23="\x17",
-    24="\x18",
-    25="\x19",
-    26="\x1A",
-    27="\x1B",
-    28="\x1C",
-    29="\x1D",
-    30="\x1E",
-    31="\x1F",
-    32="\x20",
-    33="\x21",
-    34="\x22",
-    35="\x23",
-    36="\x24",
-    37="\x25",
-    38="\x26",
-    39="\x27",
-    40="\x28",
-    41="\x29",
-    42="\x2A",
-    43="\x2B",
-    44="\x2C",
-    45="\x2D",
-    46="\x2E",
-    47="\x2F",
-    48="\x30",
-    49="\x31",
-    50="\x32",
-    51="\x33",
-    52="\x34",
-    53="\x35",
-    54="\x36",
-    55="\x37",
-    56="\x38",
-    57="\x39",
-    58="\x3A",
-    59="\x3B",
-    60="\x3C",
-    61="\x3D",
-    62="\x3E",
-    63="\x3F",
-    64="\x40",
-    65="\x41",
-    66="\x42",
-    67="\x43",
-    68="\x44",
-    69="\x45",
-    70="\x46",
-    71="\x47",
-    72="\x48",
-    73="\x49",
-    74="\x4A",
-    75="\x4B",
-    76="\x4C",
-    77="\x4D",
-    78="\x4E",
-    79="\x4F",
-    80="\x50",
-    81="\x51",
-    82="\x52",
-    83="\x53",
-    84="\x54",
-    85="\x55",
-    86="\x56",
-    87="\x57",
-    88="\x58",
-    89="\x59",
-    90="\x5A",
-    91="\x5B",
-    92="\x5C",
-    93="\x5D",
-    94="\x5E",
-    95="\x5F",
-    96="\x60",
-    97="\x61",
-    98="\x62",
-    99="\x63",
-   100="\x64",
-   101="\x65",
-   102="\x66",
-   103="\x67",
-   104="\x68",
-   105="\x69",
-   106="\x6A",
-   107="\x6B",
-   108="\x6C",
-   109="\x6D",
-   110="\x6E",
-   111="\x6F",
-   112="\x70",
-   113="\x71",
-   114="\x72",
-   115="\x73",
-   116="\x74",
-   117="\x75",
-   118="\x76",
-   119="\x77",
-   120="\x78",
-   121="\x79",
-   122="\x7A",
-   123="\x7B",
-   124="\x7C",
-   125="\x7D",
-   126="\x7E",
-   127="\x7F",
-   128="\x80",
-   129="\x81",
-   130="\x82",
-   131="\x83",
-   132="\x84",
-   133="\x85",
-   134="\x86",
-   135="\x87",
-   136="\x88",
-   137="\x89",
-   138="\x8A",
-   139="\x8B",
-   140="\x8C",
-   141="\x8D",
-   142="\x8E",
-   143="\x8F",
-   144="\x90",
-   145="\x91",
-   146="\x92",
-   147="\x93",
-   148="\x94",
-   149="\x95",
-   150="\x96",
-   151="\x97",
-   152="\x98",
-   153="\x99",
-   154="\x9A",
-   155="\x9B",
-   156="\x9C",
-   157="\x9D",
-   158="\x9E",
-   159="\x9F",
-   160="\xA0",
-   161="\xA1",
-   162="\xA2",
-   163="\xA3",
-   164="\xA4",
-   165="\xA5",
-   166="\xA6",
-   167="\xA7",
-   168="\xA8",
-   169="\xA9",
-   170="\xAA",
-   171="\xAB",
-   172="\xAC",
-   173="\xAD",
-   174="\xAE",
-   175="\xAF",
-   176="\xB0",
-   177="\xB1",
-   178="\xB2",
-   179="\xB3",
-   180="\xB4",
-   181="\xB5",
-   182="\xB6",
-   183="\xB7",
-   184="\xB8",
-   185="\xB9",
-   186="\xBA",
-   187="\xBB",
-   188="\xBC",
-   189="\xBD",
-   190="\xBE",
-   191="\xBF",
-   192="\xC0",
-   193="\xC1",
-   194="\xC2",
-   195="\xC3",
-   196="\xC4",
-   197="\xC5",
-   198="\xC6",
-   199="\xC7",
-   200="\xC8",
-   201="\xC9",
-   202="\xCA",
-   203="\xCB",
-   204="\xCC",
-   205="\xCD",
-   206="\xCE",
-   207="\xCF",
-   208="\xD0",
-   209="\xD1",
-   210="\xD2",
-   211="\xD3",
-   212="\xD4",
-   213="\xD5",
-   214="\xD6",
-   215="\xD7",
-   216="\xD8",
-   217="\xD9",
-   218="\xDA",
-   219="\xDB",
-   220="\xDC",
-   221="\xDD",
-   222="\xDE",
-   223="\xDF",
-   224="\xE0",
-   225="\xE1",
-   226="\xE2",
-   227="\xE3",
-   228="\xE4",
-   229="\xE5",
-   230="\xE6",
-   231="\xE7",
-   232="\xE8",
-   233="\xE9",
-   234="\xEA",
-   235="\xEB",
-   236="\xEC",
-   237="\xED",
-   238="\xEE",
-   239="\xEF",
-   240="\xF0",
-   241="\xF1",
-   242="\xF2",
-   243="\xF3",
-   244="\xF4",
-   245="\xF5",
-   246="\xF6",
-   247="\xF7",
-   248="\xF8",
-   249="\xF9",
-   250="\xFA",
-   251="\xFB",
-   252="\xFC",
-   253="\xFD",
-   254="\xFE",
-   255="\xFF"
+   0x00="\x00",
+   0x01="\x01",
+   0x02="\x02",
+   0x03="\x03",
+   0x04="\x04",
+   0x05="\x05",
+   0x06="\x06",
+   0x07="\x07",
+   0x08="\x08",
+   0x09="\x09",
+   0x0A="\x0A",
+   0x0B="\x0B",
+   0x0C="\x0C",
+   0x0D="\x0D",
+   0x0E="\x0E",
+   0x0F="\x0F",
+   0x10="\x10",
+   0x11="\x11",
+   0x12="\x12",
+   0x13="\x13",
+   0x14="\x14",
+   0x15="\x15",
+   0x16="\x16",
+   0x17="\x17",
+   0x18="\x18",
+   0x19="\x19",
+   0x1A="\x1A",
+   0x1B="\x1B",
+   0x1C="\x1C",
+   0x1D="\x1D",
+   0x1E="\x1E",
+   0x1F="\x1F",
+   0x20="\x20",
+   0x21="\x21",
+   0x22="\x22",
+   0x23="\x23",
+   0x24="\x24",
+   0x25="\x25",
+   0x26="\x26",
+   0x27="\x27",
+   0x28="\x28",
+   0x29="\x29",
+   0x2A="\x2A",
+   0x2B="\x2B",
+   0x2C="\x2C",
+   0x2D="\x2D",
+   0x2E="\x2E",
+   0x2F="\x2F",
+   0x30="\x30",
+   0x31="\x31",
+   0x32="\x32",
+   0x33="\x33",
+   0x34="\x34",
+   0x35="\x35",
+   0x36="\x36",
+   0x37="\x37",
+   0x38="\x38",
+   0x39="\x39",
+   0x3A="\x3A",
+   0x3B="\x3B",
+   0x3C="\x3C",
+   0x3D="\x3D",
+   0x3E="\x3E",
+   0x3F="\x3F",
+   0x40="\x40",
+   0x41="\x41",
+   0x42="\x42",
+   0x43="\x43",
+   0x44="\x44",
+   0x45="\x45",
+   0x46="\x46",
+   0x47="\x47",
+   0x48="\x48",
+   0x49="\x49",
+   0x4A="\x4A",
+   0x4B="\x4B",
+   0x4C="\x4C",
+   0x4D="\x4D",
+   0x4E="\x4E",
+   0x4F="\x4F",
+   0x50="\x50",
+   0x51="\x51",
+   0x52="\x52",
+   0x53="\x53",
+   0x54="\x54",
+   0x55="\x55",
+   0x56="\x56",
+   0x57="\x57",
+   0x58="\x58",
+   0x59="\x59",
+   0x5A="\x5A",
+   0x5B="\x5B",
+   0x5C="\x5C",
+   0x5D="\x5D",
+   0x5E="\x5E",
+   0x5F="\x5F",
+   0x60="\x60",
+   0x61="\x61",
+   0x62="\x62",
+   0x63="\x63",
+   0x64="\x64",
+   0x65="\x65",
+   0x66="\x66",
+   0x67="\x67",
+   0x68="\x68",
+   0x69="\x69",
+   0x6A="\x6A",
+   0x6B="\x6B",
+   0x6C="\x6C",
+   0x6D="\x6D",
+   0x6E="\x6E",
+   0x6F="\x6F",
+   0x70="\x70",
+   0x71="\x71",
+   0x72="\x72",
+   0x73="\x73",
+   0x74="\x74",
+   0x75="\x75",
+   0x76="\x76",
+   0x77="\x77",
+   0x78="\x78",
+   0x79="\x79",
+   0x7A="\x7A",
+   0x7B="\x7B",
+   0x7C="\x7C",
+   0x7D="\x7D",
+   0x7E="\x7E",
+   0x7F="\x7F",
+   0x80="\x80",
+   0x81="\x81",
+   0x82="\x82",
+   0x83="\x83",
+   0x84="\x84",
+   0x85="\x85",
+   0x86="\x86",
+   0x87="\x87",
+   0x88="\x88",
+   0x89="\x89",
+   0x8A="\x8A",
+   0x8B="\x8B",
+   0x8C="\x8C",
+   0x8D="\x8D",
+   0x8E="\x8E",
+   0x8F="\x8F",
+   0x90="\x90",
+   0x91="\x91",
+   0x92="\x92",
+   0x93="\x93",
+   0x94="\x94",
+   0x95="\x95",
+   0x96="\x96",
+   0x97="\x97",
+   0x98="\x98",
+   0x99="\x99",
+   0x9A="\x9A",
+   0x9B="\x9B",
+   0x9C="\x9C",
+   0x9D="\x9D",
+   0x9E="\x9E",
+   0x9F="\x9F",
+   0xA0="\xA0",
+   0xA1="\xA1",
+   0xA2="\xA2",
+   0xA3="\xA3",
+   0xA4="\xA4",
+   0xA5="\xA5",
+   0xA6="\xA6",
+   0xA7="\xA7",
+   0xA8="\xA8",
+   0xA9="\xA9",
+   0xAA="\xAA",
+   0xAB="\xAB",
+   0xAC="\xAC",
+   0xAD="\xAD",
+   0xAE="\xAE",
+   0xAF="\xAF",
+   0xB0="\xB0",
+   0xB1="\xB1",
+   0xB2="\xB2",
+   0xB3="\xB3",
+   0xB4="\xB4",
+   0xB5="\xB5",
+   0xB6="\xB6",
+   0xB7="\xB7",
+   0xB8="\xB8",
+   0xB9="\xB9",
+   0xBA="\xBA",
+   0xBB="\xBB",
+   0xBC="\xBC",
+   0xBD="\xBD",
+   0xBE="\xBE",
+   0xBF="\xBF",
+   0xC0="\xC0",
+   0xC1="\xC1",
+   0xC2="\xC2",
+   0xC3="\xC3",
+   0xC4="\xC4",
+   0xC5="\xC5",
+   0xC6="\xC6",
+   0xC7="\xC7",
+   0xC8="\xC8",
+   0xC9="\xC9",
+   0xCA="\xCA",
+   0xCB="\xCB",
+   0xCC="\xCC",
+   0xCD="\xCD",
+   0xCE="\xCE",
+   0xCF="\xCF",
+   0xD0="\xD0",
+   0xD1="\xD1",
+   0xD2="\xD2",
+   0xD3="\xD3",
+   0xD4="\xD4",
+   0xD5="\xD5",
+   0xD6="\xD6",
+   0xD7="\xD7",
+   0xD8="\xD8",
+   0xD9="\xD9",
+   0xDA="\xDA",
+   0xDB="\xDB",
+   0xDC="\xDC",
+   0xDD="\xDD",
+   0xDE="\xDE",
+   0xDF="\xDF",
+   0xE0="\xE0",
+   0xE1="\xE1",
+   0xE2="\xE2",
+   0xE3="\xE3",
+   0xE4="\xE4",
+   0xE5="\xE5",
+   0xE6="\xE6",
+   0xE7="\xE7",
+   0xE8="\xE8",
+   0xE9="\xE9",
+   0xEA="\xEA",
+   0xEB="\xEB",
+   0xEC="\xEC",
+   0xED="\xED",
+   0xEE="\xEE",
+   0xEF="\xEF",
+   0xF0="\xF0",
+   0xF1="\xF1",
+   0xF2="\xF2",
+   0xF3="\xF3",
+   0xF4="\xF4",
+   0xF5="\xF5",
+   0xF6="\xF6",
+   0xF7="\xF7",
+   0xF8="\xF8",
+   0xF9="\xF9",
+   0xFA="\xFA",
+   0xFB="\xFB",
+   0xFC="\xFC",
+   0xFD="\xFD",
+   0xFE="\xFE",
+   0xFF="\xFF"
 }
 
 U8_PREFIX::PACKAGE+"::U8(v:$$"
@@ -398,90 +416,43 @@ Stringify_Uint::struct(value:uint){
    v:String(n(Uint(value))[UINT_OFFSET:len(n(Uint(value)))-1])
 }
 
-Pad_Left::struct($str:string,$space:string,$width:uint){
-   v:String(
+Normalize_Type::struct(Type:typeid){
+   /*TODO
+      if struct with 0 fields := struct{}
+      if struct with 1 fields := struct{v0:T}
+      if struct with more fields := type_of(compress_values(expand_values(Struct_Type{})))
+      else type
+   */
+}
+
+Field_Type_By_Index::struct(Struct_Type:typeid,index:uint)where intrinsics.type_is_struct(Type){
+   v:(
       (
-         #panic("string longer than width")
-      )when len(str)>width else(
-         str
-      )when width-len(str)==0 else(
-         space+str
-      )when width-len(str)==1 else(
-         space+space+str
-      )when width-len(str)==2 else(
-         space+space+space+str
-      )when width-len(str)==3 else(
-         space+space+space+space+str
-      )when width-len(str)==4 else(
-         space+space+space+space+space+str
-      )when width-len(str)==5 else(
-         space+space+space+space+space+space+str
-      )when width-len(str)==6 else(
-         space+space+space+space+space+space+space+str
-      )when width-len(str)==7 else(
-         space+space+space+space+space+space+space+space+str
-      )when width-len(str)==8 else(
-         space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==9 else(
-         space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==10 else(
-         space+space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==11 else(
-         space+space+space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==12 else(
-         space+space+space+space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==13 else(
-         space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==14 else(
-         space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==15 else(
-         space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+str
-      )when width-len(str)==16 else(
-         space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+v(Pad_Left(str,space,width-16),"v").v
+         #panic(intrinsics.type_canonical_name(Struct_Type)+" has too few fields")
+      )when index>=intrinsics.type_struct_field_count(Struct_Type) else(
+         type_of(compress_values(expand_values(Struct_Type{})))
+      )when intrinsics.type_struct_field_count(Struct_Type)==1 else(
+         intrinsics.type_field_type(type_of(compress_values(expand_values(Struct_Type{}))),"v"+v(Stringify_Uint(index),"v").v)
       )
    )
 }
 
-Pad_Right::struct($str:string,$space:string,$width:uint){
+Pad_Left::struct(str:string,space:string,width:uint){
    v:String(
       (
          #panic("string longer than width")
       )when len(str)>width else(
-         str
-      )when width-len(str)==0 else(
-         str+space
-      )when width-len(str)==1 else(
-         str+space+space
-      )when width-len(str)==2 else(
-         str+space+space+space
-      )when width-len(str)==3 else(
-         str+space+space+space+space
-      )when width-len(str)==4 else(
-         str+space+space+space+space+space
-      )when width-len(str)==5 else(
-         str+space+space+space+space+space+space
-      )when width-len(str)==6 else(
-         str+space+space+space+space+space+space+space
-      )when width-len(str)==7 else(
-         str+space+space+space+space+space+space+space+space
-      )when width-len(str)==8 else(
-         str+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==9 else(
-         str+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==10 else(
-         str+space+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==11 else(
-         str+space+space+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==12 else(
-         str+space+space+space+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==13 else(
-         str+space+space+space+space+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==14 else(
-         str+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==15 else(
-         str+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
-      )when width-len(str)==16 else(
-         v(Pad_Right(str,space,width-16),"v").v+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space+space
+         v(Buffer_Make_Value((width-len(str))/len(space),space),"v").v+space[:(width-len(str))%%len(space)]+str
+      )
+   )
+}
+
+Pad_Right::struct(str:string,space:string,width:uint){
+   v:String(
+      (
+         #panic("string longer than width")
+      )when len(str)>width else(
+         str+v(Buffer_Make_Value((width-len(str))/len(space),space),"v").v+space[:(width-len(str))%%len(space)]
       )
    )
 }
@@ -489,16 +460,50 @@ Pad_Right::struct($str:string,$space:string,$width:uint){
 //NOTE(sobex) [N]u8 needs exponentially long to typecheck
 Buffer::struct(v:string){}
 
-Buffer_Make::struct(length:uint){
+Buffer_Make_Value::struct(count:uint,value:string){
    v:Buffer(
       (
          ""
-      )when length==0 else(
-         "\x00"
-      )when length==1 else(
-         v(Buffer_Make(length/2),"v").v+v(Buffer_Make((length+1)/2),"v").v
+      )when count==0 else(
+         value
+      )when count==1 else(
+         value+value
+      )when count==2 else(
+         value+value+value
+      )when count==3 else(
+         value+value+value+value
+      )when count==4 else(
+         value+value+value+value+value
+      )when count==5 else(
+         value+value+value+value+value+value
+      )when count==6 else(
+         value+value+value+value+value+value+value
+      )when count==7 else(
+         value+value+value+value+value+value+value+value
+      )when count==8 else(
+         value+value+value+value+value+value+value+value+value
+      )when count==9 else(
+         value+value+value+value+value+value+value+value+value+value
+      )when count==10 else(
+         value+value+value+value+value+value+value+value+value+value+value
+      )when count==11 else(
+         value+value+value+value+value+value+value+value+value+value+value+value
+      )when count==12 else(
+         value+value+value+value+value+value+value+value+value+value+value+value+value
+      )when count==13 else(
+         value+value+value+value+value+value+value+value+value+value+value+value+value+value
+      )when count==14 else(
+         value+value+value+value+value+value+value+value+value+value+value+value+value+value+value
+      )when count==15 else(
+         value+value+value+value+value+value+value+value+value+value+value+value+value+value+value+value
+      )when count==16 else(
+         v(Buffer_Make_Value(count/2,value),"v").v+v(Buffer_Make_Value((count+1)/2,value),"v").v
       )
    )
+}
+
+Buffer_Make::struct(length:uint){
+   v:v(Buffer_Make_Value(length,"\x00"),"v")
 }
 
 Buffer_Find::struct(buffer:string,value:u8,offset:int){
@@ -523,6 +528,19 @@ Buffer_Find_Last::struct(buffer:string,value:u8,offset:int){
          max(v(Buffer_Find_Last(buffer[:len(buffer)/2],value,offset),"v").v,v(Buffer_Find_Last(buffer[len(buffer)/2:],value,offset+len(buffer)/2),"v").v)
       )
    )
+}
+
+Buffer_Find_Matching_Parens_Option::enum{
+   Round,Square,Curly,Angled
+}
+
+//maybe it could switch over the current char and detect what im looking for, have this be a wrapper over _Buffer_Find...
+Buffer_Find_Closing_Matching_Parens::struct(buffer:string,index:int,option:Buffer_Find_Matching_Parens_Option){
+   /*TODO*/v:Int(0)
+}
+
+Buffer_Find_Opening_Matching_Parens::struct(buffer:string,index:int,option:Buffer_Find_Matching_Parens_Option){
+   /*TODO*/v:Int(0)
 }
 
 Buffer_Print::struct(buffer:string){
@@ -615,280 +633,6 @@ Unpack::struct(size:uint,buffer:string){
          u128(buffer[0])+u128(buffer[1])<<8+u128(buffer[2])<<16+u128(buffer[3])<<24+u128(buffer[4])<<32+u128(buffer[5])<<40+u128(buffer[6])<<48+u128(buffer[7])<<56+u128(buffer[8])<<64+u128(buffer[9])<<72+u128(buffer[10])<<80+u128(buffer[11])<<88+u128(buffer[12])<<96+u128(buffer[13])<<104+u128(buffer[14])<<112+u128(buffer[15])<<120
       )when size==16 else(
          #panic("unpack size "+n(Uint(size))[UINT_OFFSET:len(n(Uint(size)))-1]+" > 16")
-      )
-   )
-}
-
-Fibonacci_Matrix_2x2::struct(v:[2][2]u128){}
-
-Fibonacci_Matrix_2x2_Identity::Fibonacci_Matrix_2x2({{1,0},{0,1}})
-
-Fibonacci_Matrix_2x2_Mul::struct(l,r:/*Fibonacci_Matrix_2x2*/typeid){
-   v:Fibonacci_Matrix_2x2(
-      {
-         {
-            l.v[0][0]*r.v[0][0]+l.v[0][1]*r.v[1][0],
-            l.v[0][0]*r.v[0][1]+l.v[0][1]*r.v[1][1]
-         },
-         {
-            l.v[1][0]*r.v[0][0]+l.v[1][1]*r.v[1][0],
-            l.v[1][0]*r.v[0][1]+l.v[1][1]*r.v[1][1]
-         }
-      }
-   )
-}
-
-Fibonacci_Matrix_2x2_Pow::struct(m:/*Fibonacci_Matrix_2x2*/typeid,exp:uint){
-   v:/*Fibonacci_Matrix_2x2*/(
-      (
-         Fibonacci_Matrix_2x2_Identity
-      )when exp==0 else(
-         m
-      )when exp==1 else(
-         v(Fibonacci_Matrix_2x2_Pow(v(Fibonacci_Matrix_2x2_Mul(m,m),"v"),exp/2),"v")
-      )when exp%2==0 else(
-         v(Fibonacci_Matrix_2x2_Mul(v(Fibonacci_Matrix_2x2_Pow(m,exp/2),"v"),v(Fibonacci_Matrix_2x2_Pow(m,(exp+1)/2),"v")),"v")
-      )
-   )
-}
-
-Fibonacci_Base::Fibonacci_Matrix_2x2({{1,1},{1,0}})
-
-Fibonacci::struct(i:uint){
-   v:U128(v(Fibonacci_Matrix_2x2_Pow(Fibonacci_Base,i),"v").v[0][1])
-}
-
-Globals_State::struct(remaining:string,depth:uint,result:string,steps:uint,finished:bool){}
-
-//this is a bad implementation and doesnt check if a curly brace is in a comment or string, but shows off iterative state machines and how to avoid hitting the recursion limit
-Globals_Core::struct(s:/*TODO inline this struct Globals_State*/typeid,iterations_left:uint){
-   v:/*Globals_State*/(
-      (
-         s
-      )when iterations_left<=0 else(
-         s
-      )when s.finished else(
-         (
-            Globals_State(s.remaining,s.depth,s.result,s.steps+1,true)
-         )when s.depth==0 else(
-            Globals_State(s.remaining,s.depth,s.result+"<EOF reached before End of Global>",s.steps+1,true)
-         )
-      )when len(s.remaining)==0 else(
-         (
-            v(Globals_Core(Globals_State(s.remaining[1:],s.depth+1,s.result when s.depth!=0 else (s.result+"{"),s.steps+1,s.finished),iterations_left-1),"v")
-         )when s.remaining[0]=='{' else(
-            (
-               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
-            )when s.depth==0 else(
-               v(Globals_Core(Globals_State(s.remaining[1:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
-            )
-         )when s.remaining[0]=='}' else(
-            v(Globals_Core(Globals_State(s.remaining[2:],s.depth+1,s.result when s.depth!=0 else (s.result+s.remaining[:1]+"{"),s.steps+1,s.finished),iterations_left-1),"v")
-         )when s.remaining[1]=='{' else(
-            (
-               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
-            )when s.depth==0 else(
-               v(Globals_Core(Globals_State(s.remaining[2:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
-            )
-         )when s.remaining[1]=='}' else(
-            v(Globals_Core(Globals_State(s.remaining[3:],s.depth+1,s.result when s.depth!=0 else (s.result+s.remaining[:2]+"{"),s.steps+1,s.finished),iterations_left-1),"v")
-         )when s.remaining[2]=='{' else(
-            (
-               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
-            )when s.depth==0 else(
-               v(Globals_Core(Globals_State(s.remaining[3:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
-            )
-         )when s.remaining[2]=='}' else(
-            v(Globals_Core(Globals_State(s.remaining[4:],s.depth+1,s.result when s.depth!=0 else (s.result+s.remaining[:3]+"{"),s.steps+1,s.finished),iterations_left-1),"v")
-         )when s.remaining[3]=='{' else(
-            (
-               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
-            )when s.depth==0 else(
-               v(Globals_Core(Globals_State(s.remaining[4:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
-            )
-         )when s.remaining[3]=='}' else(
-            v(Globals_Core(Globals_State(s.remaining[4:],s.depth,s.result when s.depth!=0 else (s.result+s.remaining[:4]),s.steps+1,s.finished),iterations_left-1),"v")
-         )
-      //NOTE(sobex) compiletime `&&` seems to not short circuit so `when len(s.remaining)>3&&s.remaining[3]=='X'` fails
-      )when len(s.remaining)>=4 else(
-         (
-            v(Globals_Core(Globals_State(s.remaining[1:],s.depth+1,s.result when s.depth!=0 else (s.result+"{"),s.steps+1,s.finished),iterations_left-1),"v")
-         )when s.remaining[0]=='{' else(
-            (
-               Globals_State(s.remaining,s.depth,s.result+"<End of Scope reached outside a scope>",s.steps+1,true)
-            )when s.depth==0 else(
-               v(Globals_Core(Globals_State(s.remaining[1:],s.depth-1,s.result when s.depth!=1 else (s.result+"...}"),s.steps+1,s.finished),iterations_left-1),"v")
-            )
-         )when s.remaining[0]=='}' else(
-            v(Globals_Core(Globals_State(s.remaining[1:],s.depth,s.result when s.depth!=0 else (s.result+s.remaining[:1]),s.steps+1,s.finished),iterations_left-1),"v")
-         )
-      )
-   )
-}
-
-Globals_1::struct(s:/*Globals_State*/typeid,iterations_left:uint){
-   v:/*Globals_State*/(
-      (
-         s
-      )when iterations_left<=1 else(
-         s
-      )when s.finished else(
-         v(Globals_1(v(Globals_Core(s,iterations_left-1),"v"),iterations_left-1),"v")
-      )
-   )
-}
-
-Globals_2::struct(s:/*Globals_State*/typeid,iterations_left:uint){
-   v:/*Globals_State*/(
-      (
-         s
-      )when iterations_left<=2 else(
-         s
-      )when s.finished else(
-         v(Globals_2(v(Globals_1(s,iterations_left-1),"v"),iterations_left-1),"v")
-      )
-   )
-}
-
-Globals_3::struct(s:/*Globals_State*/typeid,iterations_left:uint){
-   v:/*Globals_State*/(
-      (
-         s
-      )when iterations_left<=3 else(
-         s
-      )when s.finished else(
-         v(Globals_3(v(Globals_2(s,iterations_left-1),"v"),iterations_left-1),"v")
-      )
-   )
-}
-
-Globals_4::struct(s:/*Globals_State*/typeid,iterations_left:uint){
-   v:/*Globals_State*/(
-      (
-         s
-      )when iterations_left<=4 else(
-         s
-      )when s.finished else(
-         v(Globals_4(v(Globals_3(s,iterations_left-1),"v"),iterations_left-1),"v")
-      )
-   )
-}
-
-Calculator_Node_Type::enum{
-   Invalid,
-   Multiplication,
-   Division,
-   Addition,
-   Subtraction,
-   Number
-}
-
-Calculator_Node::struct(type:Calculator_Node_Type){}
-
-Calculator_Node_Invalid::struct(type:Calculator_Node_Type){}
-
-Calculator_Node_Multiplication::struct(type:Calculator_Node_Type,ml,mr:typeid){}
-
-Calculator_Node_Division::struct(type:Calculator_Node_Type,dl,dr:typeid){}
-
-Calculator_Node_Addition::struct(type:Calculator_Node_Type,al,ar:typeid){}
-
-Calculator_Node_Subtraction::struct(type:Calculator_Node_Type,sl,sr:typeid){}
-
-Calculator_Node_Number::struct(type:Calculator_Node_Type,n:f64,ok:bool){}
-
-//NOTE(sobex) Division needs the f64 cast https://github.com/odin-lang/Odin/issues/6866
-Calculator_Calculator::struct(node:/*Calculator_Node*/typeid){
-   v:/*Calculator_Node_Number*/(
-      (
-         /*TODO do we need invalid?*/Calculator_Node_Number(.Number,0,false)
-      )when node.type==.Invalid else(
-         Calculator_Node_Number(.Number,v(Calculator_Calculator(node.ml),"v").n*v(Calculator_Calculator(node.mr),"v").n,true)
-      )when node.type==.Multiplication else(
-         Calculator_Node_Number(.Number,f64(v(Calculator_Calculator(node.dl),"v").n)/v(Calculator_Calculator(node.dr),"v").n,true)
-      )when node.type==.Division else(
-         Calculator_Node_Number(.Number,v(Calculator_Calculator(node.al),"v").n+v(Calculator_Calculator(node.ar),"v").n,true)
-      )when node.type==.Addition else(
-         Calculator_Node_Number(.Number,v(Calculator_Calculator(node.sl),"v").n-v(Calculator_Calculator(node.sr),"v").n,true)
-      )when node.type==.Subtraction else(
-         node
-      )
-   )
-}
-
-Calculator_Parser_Digits::[?]f64{0.1,0.01,0.001,0.0001,0.0001,0.00001,0.000001,0.0000001,0.00000001}
-
-Calculator_Parser_State::struct(expression:string,number:uint,seen_dot:bool,float:uint){}
-
-Calculator_Parser::struct(expression:string,number:uint,seen_dot:bool,float:uint,float_digits:uint,result:typeid){
-   v:/*Calculator_Node*/(
-      (
-         /*TODO finish number and add to left*/Calculator_Node_Number(.Number,0,false)
-      )when len(expression)==0 else(
-         /*TODO add digit to number*/Calculator_Node_Number(.Number,0,false)
-      )when !seen_dot&&(expression[0]=='0'||expression[0]=='1'||expression[0]=='2'||expression[0]=='3'||expression[0]=='4'||expression[0]=='5'||expression[0]=='6'||expression[0]=='7'||expression[0]=='8'||expression[0]=='9') else(
-         /*TODO add digit to float maybe add a fraction that i/=10 each step*/Calculator_Node_Number(.Number,0,false)
-      )when seen_dot&&(expression[0]=='0'||expression[0]=='1'||expression[0]=='2'||expression[0]=='3'||expression[0]=='4'||expression[0]=='5'||expression[0]=='6'||expression[0]=='7'||expression[0]=='8'||expression[0]=='9') else(
-         /*TODO set seen_dot*/Calculator_Node_Number(.Number,0,false)
-      )when !seen_dot&&expression[0]=='.' else(
-         /*TODO error*/Calculator_Node_Number(.Number,0,false)
-      )when seen_dot&&expression[0]=='.' else(
-         /*TODO finish number and add to left*/Calculator_Node_Number(.Number,0,false)
-      )when expression[0]=='*' else(
-         /*TODO finish number and add to left*/Calculator_Node_Number(.Number,0,false)
-      )when expression[0]=='/' else(
-         /*TODO finish number and add to left if its type isnt mul or div*/Calculator_Node_Number(.Number,0,false)
-      )when expression[0]=='+' else(
-         /*TODO finish number and add to left if its type isnt mul or div*/Calculator_Node_Number(.Number,0,false)
-      )when expression[0]=='-' else(
-         /*TODO skip whitespace and others*/Calculator_Node_Number(.Number,0,false)
-      )
-   )
-}
-
-Calculator::struct(expression:string){
-   v:v(Calculator_Calculator(v(Calculator_Parser(expression,0,false,0,0,Calculator_Node_Invalid(.Invalid)),"v")),"v")
-}
-
-Assembly::struct(
-   asm_string:string,
-   constraints_string:string
-){}
-
-_Assembler::struct(count:u8,expression:string,registers:string,stack:string,asm_string:string,constraints_string:string,clobbers:bool){
-   v:/*Assembly*/(
-      (
-         Assembly(asm_string+"mov $0, "+registers[3*stack[0]:3*(stack[0]+1)],constraints_string when !clobbers else constraints_string+",~{cc}")
-      )when len(expression)==0 else(
-         v(_Assembler(count+1,expression[1:],registers,RUNES[count]+stack[2:],asm_string+"mov "+registers[3*count:3*(count+1)]+", "+registers[3*stack[0]:3*(stack[0]+1)]+"\nimul "+registers[3*count:3*(count+1)]+", "+registers[3*stack[1]:3*(stack[1]+1)]+"\n",constraints_string+",~{"+registers[3*count:3*(count+1)]+"}",true),"v")
-      )when expression[0]=='*' else(
-         v(_Assembler(count+1,expression[1:],registers,RUNES[count]+stack[2:],asm_string+"lea "+registers[3*count:3*(count+1)]+", ["+registers[3*stack[0]:3*(stack[0]+1)]+" + "+registers[3*stack[1]:3*(stack[1]+1)]+"]\n",constraints_string+",~{"+registers[3*count:3*(count+1)]+"}",clobbers),"v")
-      )when expression[0]=='+' else(
-         v(_Assembler(count+1,expression[1:],registers,RUNES[count]+stack[2:],asm_string+"mov "+registers[3*count:3*(count+1)]+", "+registers[3*stack[0]:3*(stack[0]+1)]+"\nsub "+registers[3*count:3*(count+1)]+", "+registers[3*stack[1]:3*(stack[1]+1)]+"\n",constraints_string+",~{"+registers[3*count:3*(count+1)]+"}",clobbers),"v")
-      )when expression[0]=='-' else(
-         v(_Assembler(count,expression[1:],registers,RUNES[expression[0]-'0']+stack,asm_string,constraints_string,clobbers),"v")
-      )when expression[0]=='0'||expression[0]=='1'||expression[0]=='2'||expression[0]=='3'||expression[0]=='4'||expression[0]=='5'||expression[0]=='6'||expression[0]=='7'||expression[0]=='8'||expression[0]=='9' else(
-         v(_Assembler(count,expression[1:],registers,stack,asm_string,constraints_string,clobbers),"v")
-      )
-   )
-}
-
-Assembler_Scratch::"r8 r9 r10r11r12r13r14r15"
-
-Assembler::struct(count:uint,expression:string){
-   v:/*Assembly*/(
-      (
-         v(_Assembler(1,expression,"$0 "+Assembler_Scratch,"","","=r",false),"v")
-      )when count==0 else(
-         v(_Assembler(2,expression,"$0 $1 "+Assembler_Scratch,"","","=r,r",false),"v")
-      )when count==1 else(
-         v(_Assembler(3,expression,"$0 $1 $2 "+Assembler_Scratch,"","","=r,r,r",false),"v")
-      )when count==2 else(
-         v(_Assembler(4,expression,"$0 $1 $2 $3 "+Assembler_Scratch,"","","=r,r,r,r",false),"v")
-      )when count==3 else(
-         v(_Assembler(5,expression,"$0 $1 $2 $3 $4 "+Assembler_Scratch,"","","=r,r,r,r,r",false),"v")
-      )when count==4 else(
-         #panic("more than 4 inputs not yet supported, but feel free to add the single line you need here")
       )
    )
 }

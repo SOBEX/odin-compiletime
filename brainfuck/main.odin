@@ -1,8 +1,6 @@
 package odin_compiletime_brainfuck
 
-PACKAGE::"odin_compiletime_brainfuck"
-
-import comp "odin-compiletime"
+import comp ".."
 
 import "core:fmt"
 import "core:strings"
@@ -294,8 +292,6 @@ compile_at_runtime::proc(brainfuck:string,name:string,short:=false)->(assembly:s
    return strings.to_string(sb),"={eax},{rdx},{r8},{r9},{rdi},{r10},{rsi},{r11},~{cc},~{memory}",true
 }
 
-Run::#type proc"contextless"(tape,output,input:[]u8)->(err:bool)
-
 Assembler_State::struct(brainfuck:string,name:string,loop_stack:string,label_counter:uint,assembly:string,finished:bool){}
 
 ASSEMBLER_LABEL_WIDTH::4
@@ -374,6 +370,8 @@ Assembler_3::struct(s:/*Assembler_State*/typeid,iterations_left:uint){
    )
 }
 
+Run::#type proc"contextless"(tape,output,input:[]u8)->(err:bool)
+
 compile::proc($brainfuck:string,$name:string)->Run{
    assembly::comp.v(Assembler_3(Assembler_State(brainfuck,name,"",0,"",false),22),"v")
    #assert(assembly.finished,"Brainfuck too long, try higher recursion evasion")
@@ -388,10 +386,10 @@ compile::proc($brainfuck:string,$name:string)->Run{
       input_begin:=raw_data(input)
       input_end:=input_begin[len(input):]
       /*rsi*/input_current:=input_begin
-      /*eax*/error:=asm([^]u8,[^]u8,[^]u8,[^]u8,[^]u8,[^]u8,[^]u8)->b32 #intel{
+      /*eax*/error:=true/*asm([^]u8,[^]u8,[^]u8,[^]u8,[^]u8,[^]u8,[^]u8)->b32 #intel{
          assembly.assembly,
          "={eax},{rdx},{r8},{r9},{rdi},{r10},{rsi},{r11},~{cc},~{memory}"
-      }(tape_current,tape_begin,tape_end,output_current,output_end,input_current,input_end)
+      }(tape_current,tape_begin,tape_end,output_current,output_end,input_current,input_end)*/
       return bool(error)
    }
    return run

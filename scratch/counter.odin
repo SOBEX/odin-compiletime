@@ -1,6 +1,6 @@
-package odin_compiletime
+package odin_compiletime_scratch
 
-import comp "."
+import comp ".."
 import "core:fmt"
 
 COUNTER_0::bool(#config(COUNTER_0,false))

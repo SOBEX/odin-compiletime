@@ -1,6 +1,7 @@
 package odin_compiletime_how_to
 
 import comp ".."
+import scratch "../scratch"
 
 how_to__general_notes::proc()->string{
    return #load("../general_notes.md",string)
@@ -50,7 +51,7 @@ how_to_assert::proc($index,$count:int)->string{
    return message
 }
 
-how_to_buffer::proc($length:uint,$index:uint,$value:u8)->(_buffer:string,_found:uint,_escaped:string){
+how_to_buffer::proc($length:uint,$index:uint,$value:u8)->(_buffer:string,_found:int,_escaped:string){
    buffer::comp.v(comp.Buffer_Make(length),"v").v
    modified::buffer[:index]+comp.RUNES[value]+buffer[index+1:]
    found::comp.v(comp.Buffer_Find(modified,value,0),"v").v
@@ -67,23 +68,23 @@ how_to_pack::proc($value:i32)->(compiletime:i32,runtime:i32){
 }
 
 how_to_fibonacci::proc($i:uint)->u128{
-   return comp.v(comp.Fibonacci(i),"v").v
+   return comp.v(scratch.Fibonacci(i),"v").v
 }
 
 //`content` can be `#load(<filename>,string)` or any compiletime string
 //NOTE(sobex) initial iterations_left is *magic* and probably 21 on windows for globals but might be lower or higher :mageBill: (its avoiding a stack overflow so its some amount of when depth and type depth)
 how_to_globals::proc($content:string,$depth:uint)->(_result:string,_finished:bool){
-   INIT::comp.Globals_State(content,0,"",0,false)
+   INIT::scratch.Globals_State(content,0,"",0,false)
    when depth==0{
-      result::comp.v(comp.Globals_Core(INIT,22),"v")
+      result::comp.v(scratch.Globals_Core(INIT,22),"v")
    }else when depth==1{
-      result::comp.v(comp.Globals_1(INIT,21),"v")
+      result::comp.v(scratch.Globals_1(INIT,21),"v")
    }else when depth==2{
-      result::comp.v(comp.Globals_2(INIT,21),"v")
+      result::comp.v(scratch.Globals_2(INIT,21),"v")
    }else when depth==3{
-      result::comp.v(comp.Globals_3(INIT,21),"v")
+      result::comp.v(scratch.Globals_3(INIT,21),"v")
    }else{
-      result::comp.v(comp.Globals_4(INIT,21),"v")
+      result::comp.v(scratch.Globals_4(INIT,21),"v")
    }
    return result.result,result.finished
 }
@@ -93,16 +94,16 @@ how_to_calculator::proc(){
 }
 
 how_to_assemble::proc($COUNT:uint,$EXPRESSION:string,a,b:int)->(result:int,assembly:string){
-   ASM::comp.v(comp.Assembler(COUNT,EXPRESSION),"v")
+   ASM::comp.v(scratch.Assembler(COUNT,EXPRESSION),"v")
 
-   calc::proc(a,b:int)->int{
-      return asm(int,int)->int#intel{
-         ASM.asm_string,
-         ASM.constraints_string
-      }(a,b)
-   }
+   //calc::proc(a,b:int)->int{
+   //   return asm(int,int)->int#intel{
+   //      ASM.asm_string,
+   //      ASM.constraints_string
+   //   }(a,b)
+   //}
 
-   result=calc(a,b)
+   result=0//calc(a,b)
    assembly=comp.n(ASM)
 
    return result,assembly
