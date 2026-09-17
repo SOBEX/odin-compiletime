@@ -1,25 +1,29 @@
-# Odin compiletime
+# Odin compiletime library
 
-## How to
+## how to
 
 compiletime code snippets that cannot be expressed in functions
 
-## Test
+## test
 
 tests for how_to
 
-## Brainfuck
+## brainfuck
 
 brainfuck interpreters fully at compiletime and brainfuck parsers at compiletime that emit more optimized runtime procedures
 
-## Match
+## match
 
 string matching similar to `core:text/match` but with compiletime known patterns that emits a single optimized procedure without any runtime pattern parsing
 
-## Printf
+## fmt
 
 printing similar to `core:fmt` but with compiletime known patterns
 
-## Scratch
+## eval
+
+compiler for a simple ssa-python-ish language that lowers to odin
+
+## scratch
 
 random experiments
