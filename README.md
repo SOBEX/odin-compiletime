@@ -20,10 +20,14 @@ string matching similar to `core:text/match` but with compiletime known patterns
 
 printing similar to `core:fmt` but with compiletime known patterns
 
-## eval
+## OCL
 
-compiler for a simple ssa-python-ish language that lowers to odin
+compiler for a simple ssa-python-ish language that lowers to compiled odin (without tokenizer stage)
 
 ## scratch
 
 random experiments
+
+### scratch/calculator.odin
+
+compiletime evaluator for math expressions (with tokenizer stage)

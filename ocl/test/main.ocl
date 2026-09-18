@@ -1,0 +1,8 @@
+a=0.1
+
+2=0.2
+b=2
+
+print(a)
+a=add(a,b)
+print(a)
